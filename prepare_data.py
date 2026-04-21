@@ -4,7 +4,7 @@ load_dotenv()
 import os
 from connect_mg import get_collection
 
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small", base_url=os.getenv("BASE_URL"))
 
 def prepareData():
     with open('data/data.txt', 'r', encoding='utf-8') as fo:
@@ -43,3 +43,5 @@ def embed_data():
     print("saved successfully into MONGOO!")
 
 embed_data()
+
+# python prepare_data.py

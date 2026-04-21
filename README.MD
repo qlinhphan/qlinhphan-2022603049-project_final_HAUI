@@ -1,208 +1,215 @@
-# Agent RAG Cho Gợi Ý Điều Trị
+# Medical RAG Agent Prototype
 
-Project này là một prototype nhỏ để:
-- nhập thông tin bệnh nhân bằng ngôn ngữ tự nhiên
-- trích xuất các trường cần thiết bằng LLM
-- lưu dữ liệu đã embedding vào MongoDB
-- tạo chỉ mục FAISS
-- tìm các ca tương tự để hỗ trợ gợi ý
+Project này là một prototype chatbot hỗ trợ bác sĩ nhập thông tin bệnh nhân bằng ngôn ngữ tự nhiên, trích xuất các trường quan trọng, sau đó truy vấn dữ liệu từ MongoDB + FAISS để gợi ý hướng điều trị tham khảo.
 
-Hiện tại code được tách thành các bước nhỏ để dễ test từng phần.
+README này được viết lại theo source code hiện có trong repo, không mô tả những tính năng chưa được implement.
+
+## Tổng quan kiến trúc
+
+Ứng dụng hiện tại gồm 2 agent chạy nối tiếp trong `main.py`:
+
+1. `agent_check_input.py`  
+   Trích xuất 4 trường bắt buộc từ câu nhập của bác sĩ:
+   - `name`: tên khối u, chỉ chấp nhận `glioma`, `vis`, `lis`
+   - `area`: diện tích khối u
+   - `age`: tuổi bệnh nhân
+   - `gender`: giới tính, chỉ chấp nhận `nam`, `nữ`
+
+2. `agent_recommend_via_rag.py`  
+   Nhận JSON/text đã đủ thông tin, gọi tool RAG để tìm các bản ghi gần nhất trong tập dữ liệu và diễn giải thành câu trả lời.
+
+RAG được triển khai bởi:
+- `prepare_data.py`: đọc dữ liệu từ `data/data.txt`, tạo embedding và lưu vào MongoDB
+- `build_faiss.py`: đọc embedding từ MongoDB và build file `faiss.index`
+- `rag.py`: embed câu hỏi mới, search top-k từ FAISS, rồi map ngược lại sang dữ liệu trong MongoDB
 
 ## Cấu trúc file
 
-- `check_input.py`: dùng LLM để trích xuất `age`, `area`, `type`, `sex` từ câu nhập của bác sĩ.
-- `connect_mg.py`: kết nối MongoDB tới database `db` và collection `rag`.
-- `prepare_data.py`: đọc file `data/data.txt`, chuyển dữ liệu thành dict, tạo embedding và lưu vào MongoDB.
-- `build_faiss.py`: đọc embedding từ MongoDB và tạo file `faiss.index`.
-- `rag.py`: embed câu hỏi mới, tìm top `k=5` vector gần nhất trong FAISS, sau đó map lại về dữ liệu trong MongoDB.
-- `data/data.txt`: dữ liệu nguồn để nạp vào hệ thống.
-- `agent_analysist.py`: Phân tích các khuyến nghị mà agent_recommend.py đưa ra.
-- `agent_recommend.py`: Đưa ra các khuyến nghị cần thiết.
-
-Lưu ý:
-- Hai file `agent_analysist.py` và `agent_recommend.py` sẽ được viết sau, bên trong có thể chứa `llm`, `prompt`, `tool`.
-- README này chỉ mô tả code hiện tại.
-- Không sửa nội dung hai file agent nếu chưa có yêu cầu mới.
+- `main.py`: điểm chạy chính, dùng `LangGraph` để nối 2 agent theo chuỗi `i -> r`
+- `agent_check_input.py`: agent trích xuất và kiểm tra thông tin đầu vào
+- `agent_recommend_via_rag.py`: agent gọi tool RAG và trả về gợi ý
+- `rag.py`: hàm `ragOK(question)` để truy vấn vector similarity
+- `prepare_data.py`: nạp dữ liệu và embedding vào MongoDB
+- `build_faiss.py`: tạo file chỉ mục `faiss.index`
+- `connect_mg.py`: helper kết nối MongoDB
+- `data/data.txt`: dữ liệu nguồn
+- `agent_decided.py`: đang trống, chưa sử dụng
+- `agent_analysist_ad_dis.py`: đang trống, chưa sử dụng
 
 ## Công nghệ đang dùng
 
 - Python
 - MongoDB
 - FAISS
-- LangChain
-- OpenAI Embeddings
-- OpenAI Chat Model
+- LangChain / LangGraph
+- OpenAI-compatible chat model qua `langchain_openai`
+- OpenAI embedding model `text-embedding-3-small`
 
 ## Biến môi trường
 
-File `.env` cần có ít nhất:
+Tạo file `.env` từ `.env.example` và khai báo tối thiểu:
 
 ```env
-OPENAI_API_KEY="your_openai_api_key"
-MODEL_CHAT="gpt-4o-mini"
-MONGODB_URI="mongodb://localhost:27017/"
+OPENAI_API_KEY=your_api_key
+BASE_URL=your_openai_compatible_base_url
+MONGODB_URI=mongodb://localhost:27017/
 ```
 
-## Cài đặt thư viện
+Ghi chú:
+- Code hiện tại có đọc `BASE_URL` trong cả chat model và embedding model.
+- `.env.example` đang có `MODEL_CHAT`, nhưng source hiện tại không sử dụng biến này.
 
-Bạn có thể cài các thư viện cần thiết bằng:
+## Cài đặt
+
+Project chưa có `requirements.txt`, bạn có thể cài thủ công:
 
 ```bash
-pip install pymongo python-dotenv langchain langchain-openai langchain-core langchain-classic faiss-cpu numpy
+pip install pymongo python-dotenv numpy faiss-cpu langchain langgraph langchain-openai langchain-core langchain-classic
 ```
 
-Nếu máy đang dùng GPU hoặc môi trường đặc biệt, phần `faiss-cpu` có thể cần đổi lại cho phù hợp.
+Nếu dùng môi trường đặc biệt, gói `faiss-cpu` có thể cần thay đổi cho phù hợp.
 
-## Định dạng dữ liệu đầu vào
+## Định dạng dữ liệu
 
-File `data/data.txt` đang được đọc theo format:
+File `data/data.txt` được đọc theo format:
 
 ```text
 name | area | sex | age | treatment
-Glioma | 5.1 | male | 30 | Phẫu thuật
+Glioma | 5.1 | male | 30 | Phẫu thuật + dùng thuốc
 ```
 
-Khi xử lý trong `prepare_data.py`:
-- `name` -> tên bệnh / loại u
-- `area` -> được nhân `1000` và ép kiểu `int`
-- `sex` -> giới tính
-- `age` -> tuổi
-- `recommend` -> hướng điều trị
-
-## Luồng chạy hiện tại
-
-### 1. Kết nối MongoDB
-
-File `connect_mg.py` cung cấp:
+Khi đưa vào MongoDB, mỗi dòng được chuyển thành:
 
 ```python
-from connect_mg import get_collection
-
-collection = get_collection()
+{
+    "name": ...,
+    "area": int(float(area) * 1000),
+    "sex": ...,
+    "age": ...,
+    "recommend": ...
+}
 ```
 
-Database đang sử dụng:
-- database: `db`
-- collection: `rag`
+Sau đó script `prepare_data.py` lưu thành document dạng:
 
-Test nhanh kết nối:
+```python
+{
+    "text": {...dữ liệu bệnh án...},
+    "embedding": [...vector 1536 chiều...]
+}
+```
+
+## Cách chạy
+
+### 1. Kiểm tra kết nối MongoDB
 
 ```bash
 python connect_mg.py
 ```
 
-### 2. Nạp dữ liệu và embedding vào MongoDB
+Script sẽ ping database `db`, collection `rag`.
 
-Chạy:
+### 2. Nạp dữ liệu và tạo embedding
 
 ```bash
 python prepare_data.py
 ```
 
-File này sẽ:
+Script sẽ:
 - đọc `data/data.txt`
-- chuyển từng dòng thành object Python
-- tạo embedding bằng model `text-embedding-3-small`
-- lưu vào MongoDB với 2 trường chính:
-  - `text`
-  - `embedding`
+- tạo embedding cho từng dòng
+- insert vào MongoDB
 
-Lưu ý:
-- Nếu chạy nhiều lần, dữ liệu có thể bị insert trùng vì hiện tại chưa có bước xóa hoặc upsert.
-
-### 3. Tạo FAISS index
-
-Chạy:
+### 3. Build FAISS index
 
 ```bash
 python build_faiss.py
 ```
 
-File này sẽ:
-- đọc toàn bộ document trong collection `rag`
-- lấy trường `embedding`
+Script sẽ:
+- lấy toàn bộ embedding trong MongoDB
 - normalize vector
 - tạo `IndexFlatIP(1536)`
 - ghi ra file `faiss.index`
 
-### 4. Truy vấn RAG thử nghiệm
-
-Chạy:
+### 4. Chạy chatbot
 
 ```bash
-python rag.py
+python main.py
 ```
 
-File này hiện đang:
-- embed một câu hỏi mẫu
-- đọc file `faiss.index`
-- search top 5 vector gần nhất
-- lấy chỉ số tìm được
-- map ngược lại dữ liệu trong MongoDB
-- in ra các bản ghi phù hợp
+Luồng hỏi đáp:
+- người dùng nhập mô tả bệnh nhân
+- agent 1 trích xuất đủ 4 trường bắt buộc
+- agent 2 gọi RAG để tìm các ca tương tự
+- hệ thống in ra câu trả lời cuối cùng
 
-Ví dụ câu hỏi hiện tại trong code:
+Nhập `bye` để thoát.
+
+## Luồng xử lý chi tiết
+
+### `agent_check_input.py`
+
+Agent này sử dụng:
+- `ChatOpenAI(model="gpt-4o-mini", base_url=os.getenv("BASE_URL"))`
+- tool `toolValidInp(name, gender)` để kiểm tra giá trị hợp lệ
+- `ConversationBufferMemory` để giữ hội thoại
+
+Prompt yêu cầu agent:
+- phải thu thập đủ `name`, `area`, `age`, `gender`
+- nếu thiếu thông tin thì hỏi lại
+- khi đủ thì trả về JSON có 4 trường trên
+
+### `agent_recommend_via_rag.py`
+
+Agent này:
+- nhận output từ agent đầu
+- gọi tool `toolRagOk(question)`
+- tool sẽ gọi `ragOK(question)` trong `rag.py`
+
+Prompt ép agent phải dựa trên tool, không bốc thêm thông tin không liên quan.
+
+### `rag.py`
+
+Hàm `ragOK(question)` thực hiện:
+- tạo embedding cho câu hỏi
+- normalize vector query
+- đọc `faiss.index`
+- search `k = 10`
+- lấy danh sách document từ MongoDB
+- map chỉ số trả về từ FAISS sang danh sách text/documents
+
+Giá trị trả về hiện tại là danh sách `text` tìm được gần nhất.
+
+## Điểm cần lưu ý trong source hiện tại
+
+- `main.py` gọi `main()` trực tiếp ở cuối file, nên chạy file sẽ vào vòng lặp chat ngay.
+- `prepare_data.py` và `build_faiss.py` cũng chạy trực tiếp khi import vì gọi hàm ở cuối file.
+- `rag.py` đang có dòng test:
 
 ```python
 question = "bệnh nhân nam, 47 tuổi, mắc glioma"
+ragOK(question=question)
 ```
 
-## Trích xuất thông tin bệnh nhân
+Điều này có nghĩa là chỉ cần import `rag.py` cũng có side effect truy vấn ngay.
+- `prepare_data.py` không xóa dữ liệu cũ, nên chạy lại nhiều lần sẽ insert trùng document.
+- `agent_decided.py` và `agent_analysist_ad_dis.py` chưa có nội dung.
+- Dữ liệu trong `data/data.txt` đang có dấu hiệu lỗi encoding tiếng Việt.
+- Trong dữ liệu nguồn, trường giới tính đang là `male/female`, trong khi tool validate của agent đầu vào lại chấp nhận `nam/nữ`; đây là một hạn chế logic hiện tại.
 
-File `check_input.py` dùng `ChatOpenAI` để trích xuất:
-- `age`
-- `area`
-- `type`
-- `sex`
+## Thứ tự để xây dựng demo từ đầu
 
-Hàm chính:
-
-```python
-from check_input import checkInput
-
-result = checkInput()
-print(result)
-```
-
-Mục tiêu của prompt là:
-- nếu thiếu thông tin thì hỏi lại
-- khi đủ thông tin thì trả về JSON
-
-Dạng JSON mong muốn:
-
-```json
-{
-  "age": null,
-  "area": null,
-  "type": null,
-  "sex": null
-}
-```
-
-## Thứ tự chạy để xây dựng demo
-
-Nếu bạn muốn chạy từ đầu đến cuối, thứ tự đề xuất là:
-
-1. Cập nhật `.env`
+1. Tạo `.env`
 2. Đảm bảo MongoDB đang chạy
 3. Chạy `python prepare_data.py`
 4. Chạy `python build_faiss.py`
-5. Chạy `python rag.py`
-6. Chạy `checkInput()` để test nhập thông tin bệnh nhân
+5. Chạy `python main.py`
 
-## Hạn chế hiện tại
+## Hướng cải tiến đề xuất
 
-- `prepare_data.py` sẽ insert trùng dữ liệu nếu chạy lại nhiều lần.
-- `rag.py` đang là file test, chưa đóng gói thành hàm trả kết quả hoàn chỉnh.
-- `check_input.py` đang `return` ngay sau một lượt hỏi đáp đầu tiên.
-- Dữ liệu gốc đang có dấu hiệu lỗi mã hóa tiếng Việt trong `data/data.txt`.
-- Chưa có pipeline kết nối trọn vẹn giữa `check_input.py`, RAG và module recommend.
-
-## Hướng phát triển tiếp theo
-
-- Viết `agent_analysist.py` để phân tích đầu vào bệnh nhân.
-- Viết `agent_recommend.py` để đưa ra gợi ý điều trị.
-- Nối `check_input.py` -> RAG -> recommend thành một luồng chạy thống nhất.
-- Thêm bước làm sạch dữ liệu và tránh insert trùng.
-- Đóng gói lại thành API hoặc chatbot.
+- Tách các dòng test khỏi `rag.py`, `prepare_data.py`, `build_faiss.py` bằng `if __name__ == "__main__":`
+- Thêm bước làm sạch hoặc upsert dữ liệu trước khi insert MongoDB
+- Đồng bộ schema dữ liệu giới tính giữa dataset và input agent
+- Thêm `requirements.txt`
+- Hoàn thiện các file agent placeholder để có pipeline phân tích/quyết định rõ ràng hơn

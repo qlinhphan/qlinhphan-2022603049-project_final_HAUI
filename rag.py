@@ -1,7 +1,10 @@
 import faiss
 from connect_mg import get_collection
 from langchain_openai import OpenAIEmbeddings
-embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
+from dotenv import load_dotenv
+load_dotenv()
+import os
+embeddings = OpenAIEmbeddings(model="text-embedding-3-small", base_url=os.getenv("BASE_URL"))
 import numpy as np
 
 def ragOK(question):
@@ -11,7 +14,7 @@ def ragOK(question):
 
     fai = faiss.read_index("faiss.index")
 
-    d, i = fai.search(embbed, k = 5)
+    d, i = fai.search(embbed, k = 10)
 
     db = get_collection()
     all_data_db = list(db.find())
@@ -24,7 +27,7 @@ def ragOK(question):
 
     text_need_find = [data_text_db[i] for i in i_need]
 
-    print(text_need_find)
+    return text_need_find
     
 
 question = "bệnh nhân nam, 47 tuổi, mắc glioma"

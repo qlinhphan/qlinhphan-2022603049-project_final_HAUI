@@ -21,3 +21,5 @@ def buildFAISS():
 
 buildFAISS()
 
+# python build_faiss.py
+
