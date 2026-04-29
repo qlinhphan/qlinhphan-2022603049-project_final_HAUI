@@ -1,62 +1,62 @@
 # Medical RAG Agent
 
-Prototype tro ly AI ho tro bac si nhap thong tin benh nhan bang ngon ngu tu nhien, kiem tra du lieu dau vao, tim cac ca tuong tu bang RAG, sau do dua ra goi y dieu tri tham khao.
+Đây là prototype trợ lý AI hỗ trợ bác sĩ nhập thông tin bệnh nhân bằng ngôn ngữ tự nhiên, kiểm tra dữ liệu đầu vào, tìm các ca tương tự bằng RAG, sau đó đưa ra gợi ý điều trị tham khảo.
 
-README nay duoc viet lai theo source code hien co trong repo o thoi diem hien tai.
+README này được viết lại theo source code hiện có trong repo ở thời điểm hiện tại.
 
-## Tong quan
+## Tổng quan
 
-Du an hien gom 2 cach su dung chinh:
+Dự án hiện có 2 cách sử dụng chính:
 
 1. `main.py`
-Chay giao dien dong lenh de hoi dap truc tiep.
+Chạy giao diện dòng lệnh để hỏi đáp trực tiếp.
 
 2. `api.py`
-Cung cap API FastAPI de frontend hoac he thong khac goi vao.
+Cung cấp API FastAPI để frontend hoặc hệ thống khác gọi vào.
 
-Luong xu ly hien tai gom 3 agent:
+Luồng xử lý hiện tại gồm 3 agent:
 
 1. `agent_check_input.py`
-Trich xuat va kiem tra 4 truong bat buoc:
+Trích xuất và kiểm tra 4 trường bắt buộc:
 - `name`
 - `area`
 - `age`
 - `gender`
 
 2. `agent_recommend_via_rag.py`
-Neu da du 4 truong, agent se goi RAG de tim cac ban ghi gan nhat va dien giai thanh cau tra loi.
+Nếu đã đủ 4 trường, agent sẽ gọi RAG để tìm các bản ghi gần nhất và diễn giải thành câu trả lời.
 
 3. `agent_analysist_ad_dis.py`
-Neu nguoi dung muon di sau hon, agent nay phan tich uu diem va nhuoc diem cua cac phuong phap dieu tri tim duoc.
+Nếu người dùng muốn đi sâu hơn, agent này phân tích ưu điểm và nhược điểm của các phương pháp điều trị tìm được.
 
-## Kien truc du lieu
+## Kiến trúc dữ liệu
 
-Pipeline RAG hien tai:
+Pipeline RAG hiện tại:
 
 1. `prepare_data.py`
-Doc `data/data.txt`, chuan hoa moi dong thanh object, tao embedding va luu vao MongoDB.
+Đọc `data/data.txt`, chuẩn hóa mỗi dòng thành object, tạo embedding và lưu vào MongoDB.
 
 2. `build_faiss.py`
-Lay embedding tu MongoDB, normalize vector, build chi muc `faiss.index`.
+Lấy embedding từ MongoDB, chuẩn hóa vector, build chỉ mục `faiss.index`.
 
 3. `rag.py`
-Embed cau hoi moi, tim `top-k` trong FAISS, sau do map nguoc ve du lieu trong MongoDB.
+Embed câu hỏi mới, tìm `top-k` trong FAISS, sau đó ánh xạ ngược về dữ liệu trong MongoDB.
 
-## Cau truc file
+## Cấu trúc file
 
-- `main.py`: diem chay CLI, dung `LangGraph` de noi cac agent thanh workflow.
+- `main.py`: điểm chạy CLI, dùng `LangGraph` để nối các agent thành workflow.
 - `api.py`: FastAPI app cho chatbot.
-- `agent_check_input.py`: agent trich xuat va kiem tra dau vao.
-- `agent_recommend_via_rag.py`: agent goi tool RAG de lay goi y dieu tri.
-- `agent_analysist_ad_dis.py`: agent phan tich uu va nhuoc diem cua cac phuong phap.
-- `rag.py`: ham `ragOK(question)` de truy van vector similarity.
-- `prepare_data.py`: nap du lieu va tao embedding.
-- `build_faiss.py`: tao file `faiss.index`.
-- `connect_mg.py`: helper ket noi MongoDB.
-- `data/data.txt`: nguon du lieu text cho demo.
-- `faiss.index`: chi muc FAISS da build.
+- `agent_check_input.py`: agent trích xuất và kiểm tra đầu vào.
+- `agent_recommend_via_rag.py`: agent gọi tool RAG để lấy gợi ý điều trị.
+- `agent_analysist_ad_dis.py`: agent phân tích ưu và nhược điểm của các phương pháp.
+- `rag.py`: hàm `ragOK(question)` để truy vấn vector similarity.
+- `prepare_data.py`: nạp dữ liệu và tạo embedding.
+- `build_faiss.py`: tạo file `faiss.index`.
+- `connect_mg.py`: helper kết nối MongoDB.
+- `data/data.txt`: nguồn dữ liệu text cho demo.
+- `faiss.index`: chỉ mục FAISS đã build.
 
-## Cong nghe dang dung
+## Công nghệ đang dùng
 
 - Python
 - FastAPI
@@ -66,14 +66,14 @@ Embed cau hoi moi, tim `top-k` trong FAISS, sau do map nguoc ve du lieu trong Mo
 - LangGraph
 - `langchain-openai`
 
-Model dang duoc hard-code trong source:
+Model đang được hard-code trong source:
 
 - Chat model: `gpt-4o-mini`
 - Embedding model: `text-embedding-3-small`
 
-## Bien moi truong
+## Biến môi trường
 
-Tao file `.env` dua tren `.env.example`:
+Tạo file `.env` dựa trên `.env.example`:
 
 ```env
 OPENAI_API_KEY=your_api_key
@@ -81,34 +81,34 @@ MONGODB_URI=mongodb://localhost:27017/
 MODEL_CHAT=
 ```
 
-Luu y quan trong:
+Lưu ý quan trọng:
 
-- Source hien tai co doc `OPENAI_API_KEY` va `MONGODB_URI`.
-- Cac file agent va embedding dang goi `base_url=os.getenv("BASE_URL")`, nhung `.env.example` chua khai bao `BASE_URL`.
-- Neu ban dung OpenAI-compatible endpoint khac OpenAI goc, hay tu them:
+- Source hiện tại có đọc `OPENAI_API_KEY` và `MONGODB_URI`.
+- Các file agent và embedding đang gọi `base_url=os.getenv("BASE_URL")`, nhưng `.env.example` chưa khai báo `BASE_URL`.
+- Nếu bạn dùng OpenAI-compatible endpoint khác OpenAI gốc, hãy tự thêm:
 
 ```env
 BASE_URL=https://your-openai-compatible-endpoint/v1
 ```
 
-## Cai dat
+## Cài đặt
 
-Repo hien chua co `requirements.txt`, ban co the cai thu cong:
+Repo hiện chưa có `requirements.txt`, bạn có thể cài thủ công:
 
 ```bash
 pip install fastapi uvicorn pymongo python-dotenv numpy faiss-cpu langchain langgraph langchain-openai langchain-core langchain-classic
 ```
 
-## Dinh dang du lieu dau vao
+## Định dạng dữ liệu đầu vào
 
-File `data/data.txt` dang duoc doc theo format:
+File `data/data.txt` đang được đọc theo format:
 
 ```text
 name | area | sex | age | treatment
-Glioma | 5.1 | male | 30 | dung thuoc
+Glioma | 5.1 | male | 30 | dùng thuốc
 ```
 
-Khi dua vao MongoDB, moi dong duoc chuyen thanh:
+Khi đưa vào MongoDB, mỗi dòng được chuyển thành:
 
 ```python
 {
@@ -120,7 +120,7 @@ Khi dua vao MongoDB, moi dong duoc chuyen thanh:
 }
 ```
 
-Sau do `prepare_data.py` luu document dang:
+Sau đó `prepare_data.py` lưu document dạng:
 
 ```python
 {
@@ -129,17 +129,17 @@ Sau do `prepare_data.py` luu document dang:
 }
 ```
 
-## Cach chay
+## Cách chạy
 
-### 1. Kiem tra MongoDB
+### 1. Kiểm tra MongoDB
 
 ```bash
 python connect_mg.py
 ```
 
-Neu thanh cong, script se bao da ket noi toi database `db`, collection `rag`.
+Nếu thành công, script sẽ báo đã kết nối tới database `db`, collection `rag`.
 
-### 2. Nap du lieu va tao embedding
+### 2. Nạp dữ liệu và tạo embedding
 
 ```bash
 python prepare_data.py
@@ -151,35 +151,35 @@ python prepare_data.py
 python build_faiss.py
 ```
 
-### 4. Chay ban CLI
+### 4. Chạy bản CLI
 
 ```bash
 python main.py
 ```
 
-Luong CLI:
+Luồng CLI:
 
-- Nguoi dung nhap mo ta benh nhan.
-- Agent 1 kiem tra da du `name`, `area`, `age`, `gender` hay chua.
-- Neu chua du, he thong hoi bo sung.
-- Neu da du, agent RAG tra ve goi y dieu tri.
-- Sau do he thong hoi co muon phan tich uu/nhuoc diem hay khong.
+- Người dùng nhập mô tả bệnh nhân.
+- Agent 1 kiểm tra đã đủ `name`, `area`, `age`, `gender` hay chưa.
+- Nếu chưa đủ, hệ thống hỏi bổ sung.
+- Nếu đã đủ, agent RAG trả về gợi ý điều trị.
+- Sau đó hệ thống hỏi có muốn phân tích ưu/nhược điểm hay không.
 
-Nhap `bye` de thoat.
+Nhập `bye` để thoát.
 
-### 5. Chay ban API
+### 5. Chạy bản API
 
 ```bash
 python api.py
 ```
 
-Mac dinh API chay tai:
+Mặc định API chạy tại:
 
 ```text
 http://0.0.0.0:8001
 ```
 
-Endpoint co san:
+Endpoint có sẵn:
 
 - `GET /`
 - `GET /health`
@@ -191,28 +191,28 @@ Request:
 
 ```json
 {
-  "question": "Benh nhan nam 47 tuoi, khoi u glioma, area 5100",
+  "question": "Bệnh nhân nam 47 tuổi, khối u glioma, area 5100",
   "thread_id": "session-1"
 }
 ```
 
-Response khi da co goi y:
+Response khi đã có gợi ý:
 
 ```json
 {
   "thread_id": "session-1",
-  "question": "Benh nhan nam 47 tuoi, khoi u glioma, area 5100",
+  "question": "Bệnh nhân nam 47 tuổi, khối u glioma, area 5100",
   "status": "answered",
   "answer": "...",
   "recommend_rag": "...",
   "check_inp": "...",
   "analysis": null,
   "ask_for_analysis": true,
-  "analysis_prompt": "Ban co muon phan tich uu/nhuoc diem cua cac phuong phap nay khong?"
+  "analysis_prompt": "Bạn có muốn phân tích ưu/nhược điểm của các phương pháp này không?"
 }
 ```
 
-Neu muon yeu cau phan tich tiep, gui tiep cung `thread_id`:
+Nếu muốn yêu cầu phân tích tiếp, gửi tiếp cùng `thread_id`:
 
 ```json
 {
@@ -221,7 +221,7 @@ Neu muon yeu cau phan tich tiep, gui tiep cung `thread_id`:
 }
 ```
 
-Neu khong muon phan tich:
+Nếu không muốn phân tích:
 
 ```json
 {
@@ -230,60 +230,60 @@ Neu khong muon phan tich:
 }
 ```
 
-## Luong xu ly trong code
+## Luồng xử lý trong code
 
 ### `agent_check_input.py`
 
-- Dung `ChatOpenAI(model="gpt-4o-mini")`
-- Dung 2 tool:
+- Dùng `ChatOpenAI(model="gpt-4o-mini")`
+- Dùng 2 tool:
   - `toolCheckName`
   - `toolCheckGender`
-- Luu lich su bang `ConversationBufferMemory`
-- Khi du thong tin, agent duoc prompt de tra ve JSON gom `name`, `area`, `age`, `gender`
+- Lưu lịch sử bằng `ConversationBufferMemory`
+- Khi đủ thông tin, agent được prompt để trả về JSON gồm `name`, `area`, `age`, `gender`
 
 ### `agent_recommend_via_rag.py`
 
-- Dung tool `toolRagOk(question)`
-- Tool nay goi `ragOK(question)` trong `rag.py`
-- Agent duoc prompt de chi dua tren ket qua tool, khong boc them thong tin ngoai ngu canh
+- Dùng tool `toolRagOk(question)`
+- Tool này gọi `ragOK(question)` trong `rag.py`
+- Agent được prompt để chỉ dựa trên kết quả tool, không bốc thêm thông tin ngoài ngữ cảnh
 
 ### `agent_analysist_ad_dis.py`
 
-- Doc cau tra loi tu buoc recommend
-- Neu phat hien cac cum nhu `dung thuoc`, `phau thuat`, `theo doi`, `xa tri`, `hoa tri`, `tiem thuoc` va ten khoi u, tool se goi LLM de phan tich uu va nhuoc diem
+- Đọc câu trả lời từ bước recommend
+- Nếu phát hiện các cụm như `dùng thuốc`, `phẫu thuật`, `theo dõi`, `xạ trị`, `hóa trị`, `tiêm thuốc` và tên khối u, tool sẽ gọi LLM để phân tích ưu và nhược điểm
 
 ### `api.py`
 
-- Tao mot `LangGraph` cho moi `thread_id`
-- Luu trang thai hoi thoai trong memory
-- Ho tro quy trinh 2 buoc:
-  - hoi cau dau tien
-  - tra loi `dif=co/khong` de quyet dinh co phan tich sau goi y hay khong
+- Tạo một `LangGraph` cho mỗi `thread_id`
+- Lưu trạng thái hội thoại trong memory
+- Hỗ trợ quy trình 2 bước:
+  - hỏi câu đầu tiên
+  - trả lời `dif=co/khong` để quyết định có phân tích sau gợi ý hay không
 
-## Diem can luu y trong source hien tai
+## Điểm cần lưu ý trong source hiện tại
 
-- `prepare_data.py` va `build_faiss.py` dang chay ngay khi import vi goi ham o cuoi file.
-- `prepare_data.py` khong xoa du lieu cu, nen chay lai nhieu lan se de bi insert trung.
-- `rag.py` dang doc toan bo document trong MongoDB roi map theo index cua FAISS. Cach nay phu thuoc vao thu tu document trong database.
-- `main.py` va mot so prompt dang co dau hieu loi encoding tieng Viet.
-- `toolCheckGender` dang chap nhan `nam/nu`, trong khi dataset `data/data.txt` dang dung `male/female`.
-- `toolCheckName` kiem tra `glioma`, `meningioma`, `pituitary tumor`, nhung prompt trong mot vai cho co the viet hoa hoac khac dau cach.
-- `agent_analysist_ad_dis.py` su dung `web_search_preview` thong qua model, nen phan nay phu thuoc kha nhieu vao kha nang cua endpoint LLM dang dung.
-- Repo hien co file `api.py`, nhung khong thay file `agent_check_ok.py` trong source dang version hoa, chi thay file `.pyc` trong `__pycache__`.
+- `prepare_data.py` và `build_faiss.py` đang chạy ngay khi import vì gọi hàm ở cuối file.
+- `prepare_data.py` không xóa dữ liệu cũ, nên chạy lại nhiều lần sẽ dễ bị insert trùng.
+- `rag.py` đang đọc toàn bộ document trong MongoDB rồi map theo index của FAISS. Cách này phụ thuộc vào thứ tự document trong database.
+- `main.py` và một số prompt đang có dấu hiệu lỗi encoding tiếng Việt.
+- `toolCheckGender` đang chấp nhận `nam/nu`, trong khi dataset `data/data.txt` đang dùng `male/female`.
+- `toolCheckName` kiểm tra `glioma`, `meningioma`, `pituitary tumor`, nhưng prompt trong một vài chỗ có thể viết hoa hoặc khác dấu cách.
+- `agent_analysist_ad_dis.py` sử dụng `web_search_preview` thông qua model, nên phần này phụ thuộc khá nhiều vào khả năng của endpoint LLM đang dùng.
+- Repo hiện có file `api.py`, nhưng không thấy file `agent_check_ok.py` trong source đang version hóa, chỉ thấy file `.pyc` trong `__pycache__`.
 
-## Thu tu de demo tu dau
+## Thứ tự để demo từ đầu
 
-1. Tao `.env`
-2. Dam bao MongoDB dang chay
-3. Chay `python prepare_data.py`
-4. Chay `python build_faiss.py`
-5. Chay `python main.py` hoac `python api.py`
+1. Tạo `.env`
+2. Đảm bảo MongoDB đang chạy
+3. Chạy `python prepare_data.py`
+4. Chạy `python build_faiss.py`
+5. Chạy `python main.py` hoặc `python api.py`
 
-## Huong cai tien tiep theo
+## Hướng cải tiến tiếp theo
 
-- Them `requirements.txt`
-- Dua cac lenh chay truc tiep vao `if __name__ == "__main__":`
-- Dong bo schema gioi tinh giua input va dataset
-- Loai bo van de encoding tieng Viet
-- Gan ID on dinh cho document de map ket qua FAISS an toan hon
-- Bo sung test cho pipeline API va RAG
+- Thêm `requirements.txt`
+- Đưa các lệnh chạy trực tiếp vào `if __name__ == "__main__":`
+- Đồng bộ schema giới tính giữa input và dataset
+- Loại bỏ vấn đề encoding tiếng Việt
+- Gán ID ổn định cho document để map kết quả FAISS an toàn hơn
+- Bổ sung test cho pipeline API và RAG
