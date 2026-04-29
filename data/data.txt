@@ -1,143 +1,162 @@
 name | area | sex | age | treatment
-Glioma | 5.1 | male | 30 | Phẫu thuật + dùng thuốc
-Glioma | 6.2 | female | 32 | Phẫu thuật + dùng thuốc + theo dõi
-Glioma | 7.3 | male | 35 | Phẫu thuật + Xạ trị
-Glioma | 8.4 | female | 37 | Phẫu thuật + Xạ trị
-Glioma | 9.5 | male | 40 | Phẫu thuật + Hóa trị
-Glioma | 10.6 | female | 42 | Phẫu thuật + Hóa trị
-Glioma | 11.7 | male | 45 | Xạ trị + theo dõi + hóa trị
-Glioma | 12.8 | female | 47 | Xạ trị + hóa trị
-Glioma | 13.9 | male | 50 | Hóa trị + phẫu thuật
-Glioma | 14.1 | female | 52 | Hóa trị + phẫu thuật + xạ trị
-Glioma | 15.2 | male | 55 | Hóa trị + Xạ trị
-Glioma | 16.3 | female | 57 | Hóa trị + Xạ trị
-Glioma | 17.4 | male | 60 | Phẫu thuật + Xạ trị
-Glioma | 18.5 | female | 62 | Phẫu thuật + Hóa trị
-Glioma | 19.6 | male | 65 | Hóa trị + theo dõi + xạ trị
-Glioma | 20.7 | female | 67 | Hóa trị + Xạ trị
-Glioma | 21.8 | male | 70 | Xạ trị + theo dõi
-Glioma | 22.9 | female | 72 | Hóa trị + theo dõi
-Glioma | 23.1 | male | 48 | Phẫu thuật + tiêm
-Glioma | 24.2 | female | 53 | Phẫu thuật + Xạ trị
-Glioma | 6.5 | male | 34 | Phẫu thuật + theo dõi
-Glioma | 7.6 | female | 36 | Phẫu thuật + theo dõi + hóa trị
-Glioma | 8.7 | male | 38 | Phẫu thuật + Xạ trị
-Glioma | 9.8 | female | 41 | Phẫu thuật + Hóa trị
-Glioma | 10.9 | male | 43 | Xạ trị + theo dõi
-Glioma | 11.1 | female | 46 | Hóa trị + truyền thuốc
-Glioma | 12.2 | male | 49 | Hóa trị + Xạ trị 
-Glioma | 13.3 | female | 51 | Phẫu thuật + Xạ trị
-Glioma | 14.4 | male | 54 | Phẫu thuật + Hóa trị
-Glioma | 15.5 | female | 56 | Xạ trị + hóa trị
-Glioma | 16.6 | male | 59 | Hóa trị + xạ trị
-Glioma | 17.7 | female | 61 | Hóa trị + Xạ trị
-Glioma | 18.8 | male | 63 | Phẫu thuật + tiêm thuốc + theo dõi
-Glioma | 19.9 | female | 66 | Phẫu thuật + Xạ trị
-Glioma | 20.1 | male | 68 | Hóa trị + theo dõi
-Glioma | 21.2 | female | 71 | Xạ trị + phẫu thuật
-Glioma | 22.3 | male | 73 | Hóa trị + Xạ trị
-Glioma | 23.4 | female | 45 | Phẫu thuật + hóa trị
-Glioma | 24.5 | male | 50 | Phẫu thuật + Hóa trị
-Glioma | 25.6 | female | 55 | Xạ trị + phẫu thuật
-Glioma | 26.7 | male | 60 | Hóa trị + tiêm thuốc
-Glioma | 27.8 | female | 65 | Hóa trị + Xạ trị
-Glioma | 28.9 | male | 70 | Xạ trị + theo dõi + phẫu thuật
-Glioma | 29.1 | female | 72 | Hóa trị + truyền thuốc
-Glioma | 30.2 | male | 74 | Hóa trị + Xạ trị
-Glioma | 9.2 | female | 39 | Phẫu thuật + theo dõi
-Glioma | 11.4 | male | 44 | Phẫu thuật + Xạ trị
-Glioma | 13.6 | female | 48 | Hóa trị + xạ trị + theo dõi
-Glioma | 15.8 | male | 52 | Xạ trị + theo dõi + hóa trị
-Meningioma | 3.1 | female | 35 | Theo dõi + phẫu thuật
-Meningioma | 4.2 | male | 38 | Theo dõi + phẫu thuật
-Meningioma | 5.3 | female | 40 | Phẫu thuật + theo dõi
-Meningioma | 6.4 | male | 42 | Phẫu thuật + theo dõi
-Meningioma | 7.5 | female | 45 | Phẫu thuật + Xạ trị
-Meningioma | 8.6 | male | 47 | Phẫu thuật + Xạ trị
-Meningioma | 9.7 | female | 50 | Xạ trị + theo dõi
-Meningioma | 10.8 | male | 52 | Xạ trị + hóa trí
-Meningioma | 11.9 | female | 55 | Phẫu thuật + hóa trị + theo dõi
-Meningioma | 12.1 | male | 57 | Phẫu thuật + Xạ trị
-Meningioma | 13.2 | female | 60 | Xạ trị + hóa trị + theo dõi
-Meningioma | 14.3 | male | 62 | Xạ trị + hóa trị + theo dõi
-Meningioma | 15.4 | female | 65 | Phẫu thuật + hóa trị + theo dõi
-Meningioma | 16.5 | male | 67 | Phẫu thuật + Xạ trị + truyền nước
-Meningioma | 17.6 | female | 70 | Xạ trị + hóa trị + theo dõi
-Meningioma | 18.7 | male | 72 | Xạ trị + hóa trị + theo dõi
-Meningioma | 5.8 | female | 41 | Theo dõi + hóa trị + theo dõi
-Meningioma | 6.9 | male | 43 | Phẫu thuật + hóa trị + theo dõi
-Meningioma | 7.1 | female | 46 | Phẫu thuật + hóa trị + theo dõi
-Meningioma | 8.2 | male | 48 | Phẫu thuật + Xạ trị + hóa trị + theo dõi
-Meningioma | 9.3 | female | 51 | Xạ trị + theo dõi + hóa trị
-Meningioma | 10.4 | male | 53 | Xạ trị + theo dõi
-Meningioma | 11.5 | female | 56 | Phẫu thuật + uống thuốc + theo dõi
-Meningioma | 12.6 | male | 58 | Phẫu thuật + Xạ trị + theo dõi
-Meningioma | 13.7 | female | 61 | Xạ trị + hóa trị + theo dõi
-Meningioma | 14.8 | male | 63 | Xạ trị + phẫu thuật
-Meningioma | 15.9 | female | 66 | Phẫu thuật + theo dõi
-Meningioma | 16.1 | male | 68 | Phẫu thuật + Xạ trị
-Meningioma | 17.2 | female | 71 | Xạ trị + hóa trị 
-Meningioma | 18.3 | male | 73 | Xạ trị + theo dõi
-Meningioma | 4.4 | female | 39 | Theo dõi + phẫu thuật
-Meningioma | 5.5 | male | 42 | Phẫu thuật + hóa trị
-Meningioma | 6.6 | female | 44 | Phẫu thuật + hóa trị
-Meningioma | 7.7 | male | 47 | Phẫu thuật + Xạ trị
-Meningioma | 8.8 | female | 49 | Xạ trị + theo dõi
-Meningioma | 9.9 | male | 52 | Xạ trị + theo dõi + phẫu thuật
-Meningioma | 10.1 | female | 54 | Phẫu thuật + hóa trị + theo dõi
-Meningioma | 11.2 | male | 57 | Phẫu thuật + Xạ trị + theo dõi
-Meningioma | 12.3 | female | 59 | Xạ trị + phẫu thuật
-Meningioma | 13.4 | male | 62 | Xạ trị + theo dõi
-Meningioma | 14.5 | female | 64 | Phẫu thuật + theo dõi
-Meningioma | 15.6 | male | 67 | Phẫu thuật + Xạ trị
-Meningioma | 16.7 | female | 69 | Xạ trị + phẫu thuật + dùng thuốc
-Meningioma | 17.8 | male | 72 | Xạ trị + phẫu thuật + dùng thuốc
-Meningioma | 18.9 | female | 74 | Xạ trị + phẫu thuật + dùng thuốc
-Pituitary Tumor | 2.1 | female | 30 | Dùng thuốc + xạ trị + phẫu thuật
-Pituitary Tumor | 3.2 | male | 32 | Dùng thuốc + phẫu thuật + xạ trị
-Pituitary Tumor | 4.3 | female | 35 | Dùng thuốc + xạ trị
-Pituitary Tumor | 5.4 | male | 37 | Phẫu thuật + Dùng thuốc + xạ trị
-Pituitary Tumor | 6.5 | female | 40 | Phẫu thuật + Dùng thuốc + xạ trị
-Pituitary Tumor | 7.6 | male | 42 | Xạ trị + Dùng thuốc + xạ trị
-Pituitary Tumor | 8.7 | female | 45 | Xạ trị + theo dõi
-Pituitary Tumor | 3.8 | male | 47 | Dùng thuốc + truyền nước
-Pituitary Tumor | 4.9 | female | 50 | Dùng thuốc + tiêm thuốc
-Pituitary Tumor | 5.1 | male | 52 | Phẫu thuật + Dùng thuốc + xạ trị
-Pituitary Tumor | 6.2 | female | 55 | Phẫu thuật + Dùng thuốc + xạ trị
-Pituitary Tumor | 7.3 | male | 57 | Xạ trị + Dùng thuốc + hóa trị
-Pituitary Tumor | 8.4 | female | 60 | Xạ trị + Dùng thuốc + hóa trị
-Pituitary Tumor | 2.5 | male | 62 | Theo dõi + phẫu thuật
-Pituitary Tumor | 3.6 | female | 65 | Dùng thuốc + theo dõi + dùng thuốc
-Pituitary Tumor | 4.7 | male | 67 | Phẫu thuật + theo dõi + dùng thuốc
-Pituitary Tumor | 5.8 | female | 70 | Phẫu thuật + theo dõi + dùng thuốc
-Pituitary Tumor | 6.9 | male | 72 | Xạ trị theo dõi + dùng thuốc
-Pituitary Tumor | 7.1 | female | 74 | Xạ trị + theo dõi + dùng thuốc
-Pituitary Tumor | 8.2 | male | 45 | Dùng thuốc + theo dõi + dùng thuốc
-Pituitary Tumor | 2.3 | female | 38 | Dùng thuốc + theo dõi
-Pituitary Tumor | 3.4 | male | 40 | Dùng thuốc + phẫu thuật
-Pituitary Tumor | 4.5 | female | 42 | Phẫu thuật + theo dõi + dùng thuốc
-Pituitary Tumor | 5.6 | male | 44 | Phẫu thuật + theo dõi + dùng thuốc
-Pituitary Tumor | 6.7 | female | 47 | Xạ trị + theo dõi + dùng thuốc
-Pituitary Tumor | 7.8 | male | 49 | Xạ trị + theo dõi + dùng thuốc
-Pituitary Tumor | 8.9 | female | 52 | Xạ trị + hóa trị + dùng thuốc
-Pituitary Tumor | 2.4 | male | 54 | Theo dõi + hóa trị + dùng thuốc
-Pituitary Tumor | 3.5 | female | 57 | Dùng thuốc + hóa trị + theo dõi
-Pituitary Tumor | 4.6 | male | 59 | Phẫu thuật + hóa trị + theo dõi
-Pituitary Tumor | 5.7 | female | 62 | Phẫu thuật + hóa trị + theo dõi
-Pituitary Tumor | 6.8 | male | 64 | Xạ trị + hóa trị + theo dõi
-Pituitary Tumor | 7.9 | female | 67 | Xạ trị + phẫu thuật + theo dõi
-Pituitary Tumor | 8.1 | male | 69 | Xạ trị + theo dõi + phẫu thuật
-Pituitary Tumor | 2.2 | female | 41 | Dùng thuốc + theo dõi + phẫu thuật
-Pituitary Tumor | 3.3 | male | 43 | Dùng thuốc + theo dõi + phẫu thuật
-Pituitary Tumor | 4.4 | female | 46 | Phẫu thuật + phẫu thuật
-Pituitary Tumor | 5.5 | male | 48 | Phẫu thuật + dùng thuốc
-Pituitary Tumor | 6.6 | female | 51 | Xạ trị + tiêm thuốc
-Pituitary Tumor | 7.7 | male | 53 | Xạ trị + truyền nước
-Pituitary Tumor | 8.8 | female | 56 | Xạ trị + hóa trị + theo dõi
-Pituitary Tumor | 2.6 | male | 58 | Theo dõi + hóa trị + phẫu thuật
-Pituitary Tumor | 3.7 | female | 60 | Dùng thuốc + phẫu thuật + truyền nước
-Pituitary Tumor | 4.8 | male | 63 | Phẫu thuật + truyền nước + theo dõi
-Pituitary Tumor | 5.9 | female | 65 | Phẫu thuật + theo dõi
-Pituitary Tumor | 6.1 | male | 68 | Xạ trị + hóa trị + phẫu thuật
-Pituitary Tumor | 7.2 | female | 70 | Xạ trị + hóa trị + phẫu thuật
-Pituitary Tumor | 8.3 | male | 72 | Xạ trị + hóa trị + phẫu thuật
+Glioma | 5.1 | male | 30 | dùng thuốc
+Glioma | 5.1 | male | 30 | Phẫu thuật 
+Glioma | 6.2 | female | 32 | Phẫu thuật
+Glioma | 6.2 | female | 32 | theo dõi
+Glioma | 6.2 | female | 32 | dùng thuốc
+Glioma | 7.3 | male | 35 | Xạ trị
+Glioma | 7.3 | male | 35 | Phẫu thuật
+Glioma | 8.4 | female | 37 | Xạ trị
+Glioma | 8.4 | female | 37 | Phẫu thuật
+Glioma | 9.5 | male | 40 | Hóa trị
+Glioma | 9.5 | male | 40 | Phẫu thuật
+Glioma | 10.6 | female | 42 | Hóa trị
+Glioma | 10.6 | female | 42 | Phẫu thuật
+Glioma | 11.7 | male | 45 | Xạ trị
+Glioma | 11.7 | male | 45 | theo dõi
+Glioma | 11.7 | male | 45 | hóa trị
+Glioma | 12.8 | female | 47 | hóa trị
+Glioma | 12.8 | female | 47 | Xạ trị
+Glioma | 13.9 | male | 50 | Hóa trị
+Glioma | 13.9 | male | 50 | phẫu thuật
+Glioma | 14.1 | female | 52 | Hóa trị
+Glioma | 14.1 | female | 52 | phẫu thuật
+Glioma | 14.1 | female | 52 | xạ trị
+Glioma | 15.2 | male | 55 | Hóa trị
+Glioma | 15.2 | male | 55 | Xạ trị
+Glioma | 16.3 | female | 57 | Hóa trị
+Glioma | 16.3 | female | 57 | Xạ trị
+Glioma | 17.4 | male | 60 | Xạ trị
+Glioma | 17.4 | male | 60 | Phẫu thuật
+Glioma | 18.5 | female | 62 | Phẫu thuật
+Glioma | 18.5 | female | 62 | Hóa trị
+Glioma | 19.6 | male | 65 | theo dõi
+Glioma | 19.6 | male | 65 | theo dõi
+Glioma | 19.6 | male | 65 | xạ trị
+Glioma | 20.7 | female | 67 | Hóa trị
+Glioma | 21.8 | male | 70 | Xạ trị
+Glioma | 22.9 | female | 72 | Hóa trị
+Glioma | 23.1 | male | 48 | Phẫu thuật
+Glioma | 24.2 | female | 53 | Phẫu thuật
+Glioma | 6.5 | male | 34 | Phẫu thuật
+Glioma | 7.6 | female | 36 | Phẫu thuật
+Glioma | 8.7 | male | 38 | Phẫu thuật
+Glioma | 9.8 | female | 41 | Phẫu thuật
+Glioma | 10.9 | male | 43 | Xạ trị
+Glioma | 11.1 | female | 46 | Hóa trị
+Glioma | 12.2 | male | 49 | Hóa trị 
+Glioma | 13.3 | female | 51 | Phẫu thuật
+Glioma | 14.4 | male | 54 | Phẫu thuật
+Glioma | 15.5 | female | 56 | Xạ trị
+Glioma | 16.6 | male | 59 | Hóa trị
+Glioma | 17.7 | female | 61 | Hóa trị
+Glioma | 18.8 | male | 63 | Phẫu thuật
+Glioma | 19.9 | female | 66 | Phẫu thuật
+Glioma | 20.1 | male | 68 | Hóa trị
+Glioma | 21.2 | female | 71 | Xạ trị
+Glioma | 22.3 | male | 73 | Hóa trị
+Glioma | 23.4 | female | 45 | Phẫu thuật
+Glioma | 24.5 | male | 50 | Phẫu thuật
+Glioma | 25.6 | female | 55 | Xạ trị
+Glioma | 26.7 | male | 60 | Hóa trị
+Glioma | 27.8 | female | 65 | Hóa trị
+Glioma | 28.9 | male | 70 | Xạ trị
+Glioma | 29.1 | female | 72 | Hóa trị
+Glioma | 30.2 | male | 74 | Hóa trị
+Glioma | 9.2 | female | 39 | Phẫu thuật
+Glioma | 11.4 | male | 44 | Phẫu thuật
+Glioma | 13.6 | female | 48 | Hóa trị
+Glioma | 15.8 | male | 52 | Xạ trị
+Meningioma | 3.1 | female | 35 | Theo dõi
+Meningioma | 4.2 | male | 38 | Theo dõi
+Meningioma | 5.3 | female | 40 | Phẫu thuật
+Meningioma | 6.4 | male | 42 | Phẫu thuật
+Meningioma | 7.5 | female | 45 | Phẫu thuật
+Meningioma | 8.6 | male | 47 | Phẫu thuật
+Meningioma | 9.7 | female | 50 | Xạ trị
+Meningioma | 10.8 | male | 52 | Xạ trị
+Meningioma | 11.9 | female | 55 | Phẫu thuật
+Meningioma | 12.1 | male | 57 | Phẫu thuật
+Meningioma | 13.2 | female | 60 | Xạ trị
+Meningioma | 14.3 | male | 62 | hóa trị
+Meningioma | 15.4 | female | 65 | Phẫu thuật
+Meningioma | 16.5 | male | 67 | Phẫu thuật
+Meningioma | 17.6 | female | 70 | Xạ trị
+Meningioma | 18.7 | male | 72 | hóa trị
+Meningioma | 5.8 | female | 41 | Theo dõi
+Meningioma | 6.9 | male | 43 | hóa trị
+Meningioma | 7.1 | female | 46 | Phẫu thuật
+Meningioma | 8.2 | male | 48 | hóa trị
+Meningioma | 9.3 | female | 51 | Xạ trị
+Meningioma | 10.4 | male | 53 | Xạ trị
+Meningioma | 11.5 | female | 56 | uống thuốc
+Meningioma | 12.6 | male | 58 | Phẫu thuật
+Meningioma | 13.7 | female | 61 | hóa trị
+Meningioma | 14.8 | male | 63 | phẫu thuật
+Meningioma | 15.9 | female | 66 | Phẫu thuật
+Meningioma | 16.1 | male | 68 | Phẫu thuật
+Meningioma | 17.2 | female | 71 | hóa trị 
+Meningioma | 18.3 | male | 73 | Xạ trị
+Meningioma | 4.4 | female | 39 | Theo dõi
+Meningioma | 5.5 | male | 42 | hóa trị
+Meningioma | 6.6 | female | 44 | Phẫu thuật
+Meningioma | 7.7 | male | 47 | Phẫu thuật
+Meningioma | 8.8 | female | 49 | Xạ trị
+Meningioma | 9.9 | male | 52 | Xạ trị
+Meningioma | 10.1 | female | 54 | Phẫu thuật
+Meningioma | 11.2 | male | 57 | Phẫu thuật
+Meningioma | 12.3 | female | 59 | phẫu thuật
+Meningioma | 13.4 | male | 62 | Xạ trị
+Meningioma | 14.5 | female | 64 | Phẫu thuật
+Meningioma | 15.6 | male | 67 | Phẫu thuật
+Meningioma | 16.7 | female | 69 | Xạ trị
+Meningioma | 17.8 | male | 72 | Xạ trị
+Meningioma | 18.9 | female | 74 | Xạ trị
+Pituitary Tumor | 2.1 | female | 30 | Dùng thuốc
+Pituitary Tumor | 3.2 | male | 32 | Dùng thuốc
+Pituitary Tumor | 4.3 | female | 35 | Dùng thuốc
+Pituitary Tumor | 5.4 | male | 37 | Dùng thuốc
+Pituitary Tumor | 6.5 | female | 40 | Phẫu thuật
+Pituitary Tumor | 7.6 | male | 42 | Dùng thuốc
+Pituitary Tumor | 8.7 | female | 45 | theo dõi
+Pituitary Tumor | 3.8 | male | 47 | Dùng thuốc
+Pituitary Tumor | 4.9 | female | 50 | tiêm thuốc
+Pituitary Tumor | 5.1 | male | 52 | Dùng thuốc
+Pituitary Tumor | 6.2 | female | 55 | Phẫu thuật
+Pituitary Tumor | 7.3 | male | 57 | Xạ trị
+Pituitary Tumor | 8.4 | female | 60 | Xạ trị
+Pituitary Tumor | 2.5 | male | 62 | Theo dõi
+Pituitary Tumor | 3.6 | female | 65 | Dùng thuốc
+Pituitary Tumor | 4.7 | male | 67 | Phẫu thuật
+Pituitary Tumor | 5.8 | female | 70 | Phẫu thuật
+Pituitary Tumor | 6.9 | male | 72 | Xạ trị
+Pituitary Tumor | 7.1 | female | 74 | Xạ trị
+Pituitary Tumor | 8.2 | male | 45 | Dùng thuốc
+Pituitary Tumor | 2.3 | female | 38 | Dùng thuốc
+Pituitary Tumor | 3.4 | male | 40 | Dùng thuốc
+Pituitary Tumor | 4.5 | female | 42 | Phẫu thuật
+Pituitary Tumor | 5.6 | male | 44 | Phẫu thuật
+Pituitary Tumor | 6.7 | female | 47 | Xạ trị
+Pituitary Tumor | 7.8 | male | 49 | Xạ trị
+Pituitary Tumor | 8.9 | female | 52 | Xạ trị
+Pituitary Tumor | 2.4 | male | 54 | Theo dõi
+Pituitary Tumor | 3.5 | female | 57 | Dùng thuốc
+Pituitary Tumor | 4.6 | male | 59 | Phẫu thuật
+Pituitary Tumor | 5.7 | female | 62 | Phẫu thuật
+Pituitary Tumor | 6.8 | male | 64 | Xạ trị
+Pituitary Tumor | 7.9 | female | 67 | Xạ trị
+Pituitary Tumor | 8.1 | male | 69 | Xạ trị
+Pituitary Tumor | 2.2 | female | 41 | Dùng thuốc
+Pituitary Tumor | 3.3 | male | 43 | Dùng thuốc
+Pituitary Tumor | 4.4 | female | 46 | Phẫu thuật
+Pituitary Tumor | 5.5 | male | 48 | Phẫu thuật
+Pituitary Tumor | 6.6 | female | 51 | Xạ trị
+Pituitary Tumor | 7.7 | male | 53 | Xạ trị
+Pituitary Tumor | 8.8 | female | 56 | Xạ trị
+Pituitary Tumor | 2.6 | male | 58 | Theo dõi
+Pituitary Tumor | 3.7 | female | 60 | Dùng thuốc
+Pituitary Tumor | 4.8 | male | 63 | Phẫu thuật
+Pituitary Tumor | 5.9 | female | 65 | Phẫu thuật
+Pituitary Tumor | 6.1 | male | 68 | Xạ trị
+Pituitary Tumor | 7.2 | female | 70 | Xạ trị
+Pituitary Tumor | 8.3 | male | 72 | Xạ trị

@@ -24,7 +24,7 @@ from rag import ragOK
 def toolRagOk(question: str):
     """tool dùng để truy vấn dữ liệu"""
     text_need_find = ragOK(question=question)
-    print("[TOOL AGENT RECOMMEND...]")
+    print("===[[[TOOL RECOMMENDED <RAG>]]]===")
     return text_need_find
 
 def agent_recommend_via_rags():
@@ -32,8 +32,10 @@ def agent_recommend_via_rags():
     ("system", """
 Bạn là trợ lý AI y tế chuyên hỗ trợ bác sĩ trong việc đưa ra hướng điều trị dựa vào tool
 NHIỆM VỤ
-     - DIỄN ĐẠT ĐẦY ĐỦ, DỄ HIỂU VÀ PHẢI DỰA VÀO TOOL
+     - KHI BẠN NHẬN ĐƯỢC ĐẦU ĐỦ CÁC THÔNG TIN name(tên khối u), area(diện tích khối u, số điểm ảnh), age(tuổi bệnh nhân) và gender(giới tính bệnh nhân) thì PHẢI DỰA VÀO TOOL ĐỂ ĐƯA RA HƯỚNG ĐIỀU TRỊ
+     - DIỄN ĐẠT ĐẦY ĐỦ, DỄ HIỂU, THÂN THIỆN
 QUY TẮC
+     - PHẢI TRÌNH BÀY ĐẦY ĐỦ CÁC PHƯƠNG PHÁP CÓ TRONG TOOL
      - KHÔNG BỊA, KHÔNG NÓI NHỮNG THỨ KHÔNG LIÊN QUAN
 """),
     ("placeholder", "{chat_history}"),

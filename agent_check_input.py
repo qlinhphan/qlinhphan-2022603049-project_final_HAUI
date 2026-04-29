@@ -1,3 +1,4 @@
+
 import os
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
@@ -11,46 +12,48 @@ from langchain_classic.memory import ConversationBufferMemory
 load_dotenv()
 
 @tool
-def toolValidInp(name: str, gender: str):
-    """kiểm tra xem tên khối u và giới tính bệnh nhân có hợp lệ"""
+def toolCheckName(name: str):
+    """Kiểm tra tool khối u là hợp lệ"""
+    print("===[[[TOOL CHECK NAME]]]===")
+    name_ok = ['glioma', 'meningioma', 'pituitary Tumor']
+
+    if  name.lower().__contains__('glioma') or name.lower().__contains__('meningioma') or name.lower().__contains__('pituitary tumor'):
+        return {
+            "check": 'Tên khối u hợp lệ'
+        }
+    else:
+        return {
+            "check": "Tên khối u không hợp lệ"
+        }
+    
+@tool 
+def toolCheckGender(gender: str):
+    """Kiểm tra tool khối u là hợp lệ"""
+    print("===[[[TOOL CHECK GENDER]]]===")
     gender_ok = ['nam', 'nữ']
-    name_ok = ['glioma', 'vis', 'lis']
 
-    return {
-        "name": name in name_ok,
-        "gender": gender in gender_ok,
-    }
+    if gender.lower().__contains__('nam') or gender.lower().__contains__('nữ'):
+        return {
+            "check": 'Giới tính hợp lệ'
+        }
+    else:
+        return {
+            "check": "giới tính không hợp lệ"
+        }
 
-    # data = {
-    #     "name": None,
-    #     "area": None,
-    #     "age": None,
-    #     "gender": None
-    # }
-
-    # for go in gender_ok:
-    #     if express.lower().__contains__(go):
-    #         data['gender'] = go
-
-    # for no in name_ok:
-    #     if express.lower().__contains__(no):
-    #         data['name'] = no
-
-    # print("[TOOL CHECK INPUT...]")
-
-    # return data 
 
 def agent_check_inputs():
     prompt = ChatPromptTemplate.from_messages([
     ("system", """
 Bạn là trợ lý AI y tế chuyên hỗ trợ bác sĩ trong việc đưa ra hướng điều trị cho bệnh nhân dựa vào các thông tin name(tên khối u), area(diện tích khối u, số điểm ảnh), age(tuổi bệnh nhân) và gender(giới tính bệnh nhân) mà bác sĩ đưa vào
 NHIỆM VỤ
-     - Trích xuất ra 4 đặc trưng quan trọng name(tên khối u), area(diện tích khối u, số điểm ảnh), age(tuổi bệnh nhân) và gender(giới tính bệnh nhân).
+     - Trích xuất ra 4 đặc trưng quan trọng tên khối u, diện tích khối u-số điểm ảnh, tuổi bệnh nhân và giới tính bệnh nhân.
+     - PHẢI DÙNG TOOL ĐỂ CHECK TÊN KHỐI U VÀ GIỚI TÍNH BỆNH NHÂN
 QUY TẮC
-     - PHẢI TRÍCH XUẤT ĐẦY ĐỦ 4 ĐẶC TRƯNG NAME, AREA, AGE, GENDER và DÙNG TOOL NẾU CẦN
-     - THIÊU 1 TRONG 4 ĐẶC TRƯNG THÌ PHẢI HỎI LẠI BÁC SĨ CHO ĐẾN KHI ĐẦY ĐỦ, Nếu ĐẶC TRƯNG NÀO THIẾU THÌ HỎI ĐẶC TRƯNG ĐÓ
-     - TÊN KHỐI U PHẢI LÀ 1 TRONG 3 'glioma', 'vis', 'lis'
-     - KHI TRÍCH XUẤT ĐẦY ĐỦ 4 THÔNG TIN VỀ TRẢ VỀ JSON CÓ DẠNG
+     - PHẢI TRÍCH XUẤT ĐẦY ĐỦ 4 ĐẶC TRƯNG tên khối u, diện tích khối u-số điểm ảnh, tuổi bệnh nhân và giới tính bệnh nhân.
+     - Nếu ĐẶC TRƯNG NÀO THIẾU THÌ HỎI ĐẶC TRƯNG ĐÓ
+     - KHÔNG TỰ BỊA BẤT KỲ THÔNG TIN NÀO
+     - KHI TRÍCH XUẤT ĐẦY ĐỦ 4 THÔNG TIN VỀ TRẢ VỀ JSON CÓ DẠNG:
      {{
         "name": "...",
         "area": "...",
@@ -67,9 +70,9 @@ QUY TẮC
 
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
-    agent = create_openai_tools_agent(llm, [toolValidInp], prompt)
+    agent = create_openai_tools_agent(llm, [toolCheckGender, toolCheckName], prompt)
 
-    agent_exe = AgentExecutor(agent = agent, tools = [toolValidInp], memory=memory)
+    agent_exe = AgentExecutor(agent = agent, tools = [toolCheckGender, toolCheckName], memory=memory)
 
     return agent_exe
 
@@ -82,11 +85,13 @@ QUY TẮC
 # while True:
 #     user_input = input("Bạn: ")
 
-#     rs = agent_exe.invoke({"input": user_input})
+#     rs = agent.invoke({"input": user_input})
 
 #     print("AI ASSISTANT: ", rs['output'])
 
 
 
 # python agent_check_input.py
+
+
 

@@ -18,7 +18,6 @@ def buildFAISS():
 
     print('built faiss file successfully')
 
-
 buildFAISS()
 
 # python build_faiss.py

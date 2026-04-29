@@ -27,8 +27,6 @@ def ragOK(question):
 
     text_need_find = [data_text_db[i] for i in i_need]
 
-    return text_need_find
-    
+    print("TEXT fIND: ", text_need_find)
 
-question = "bệnh nhân nam, 47 tuổi, mắc glioma"
-ragOK(question=question)
+    return text_need_find
