@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,5 +34,9 @@ public class UserService {
 
 	public Page<User> findAllUsers(Pageable p) {
 		return this.userRepository.findAll(p);
+	}
+
+	public List<User> findAllUsersNoPages() {
+		return this.userRepository.findAll();
 	}
 }

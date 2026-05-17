@@ -18,12 +18,14 @@ import com.example.demo.service.UserService;
 import com.example.demo.utils.CreateTokens;
 
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000/", allowCredentials = "true")
 public class AuthController {
 
 	@Autowired
@@ -52,13 +54,14 @@ public class AuthController {
 		ls.setName(userByEmail.getName());
 		ls.setAccessToken(acToken);
 		ls.setRefreshToken(rfToken);
+		ls.setRoleName(userByEmail.getRole().getName());
 
 		userByEmail.setRefreshToken(rfToken);
 		this.userService.saveUserService(userByEmail);
 
 		ResponseCookie springCookie = ResponseCookie.from("user", rfToken)
 				.httpOnly(true)
-				.secure(true)
+				// .secure(true)
 				.path("/")
 				.maxAge(36500)
 				.build();
@@ -95,7 +98,7 @@ public class AuthController {
 
 		ResponseCookie springCookie = ResponseCookie.from("user", rfToken)
 				.httpOnly(true)
-				.secure(true)
+				// .secure(true)
 				.path("/")
 				.maxAge(36500)
 				.build();
@@ -107,10 +110,24 @@ public class AuthController {
 	}
 
 	@PostMapping("/logout-app")
-	public String logout() {
+	public ResponseEntity<?> logout() {
 		String email = SecurityContextHolder.getContext().getAuthentication().getName();
 
-		return email;
+		ResponseCookie springCookie = ResponseCookie.from("user", "")
+				.httpOnly(true)
+				// .secure(true)
+				.path("/")
+				.maxAge(0)
+				.build();
+
+		User userByEmail = this.userService.findUserByEmail(email);
+		userByEmail.setRefreshToken("");
+		this.userService.saveUserService(userByEmail);
+
+		return ResponseEntity
+				.ok()
+				.header(org.springframework.http.HttpHeaders.SET_COOKIE, springCookie.toString())
+				.body("Logout successfully");
 	}
 
 }

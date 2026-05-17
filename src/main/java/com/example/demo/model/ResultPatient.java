@@ -1,37 +1,39 @@
 package com.example.demo.model;
 
-import java.time.Instant;
-
-import org.springframework.jmx.export.annotation.ManagedAttribute;
+import java.awt.List;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "result")
-public class Result {
+@Table(name = "resultPatients")
+public class ResultPatient {
     @Id
-    private String idResult;
-    private long area; // dien tich
-    private String name;
-    private String description; // mo ta cua bac si hoac ghi chu
-    private long time; // so lan kham
-    private Instant createdAt; // thoi gian tao ket qua
+    private String idResultPatient;
 
-    // n result -> 1 user
+    private long area; // dien tich
+    private String description;
+    private long time; // so lan kham
+    private String nameType; // loai khoi u
+
     @ManyToOne
     @JoinColumn(name = "idUser")
     private User user;
 
-    public String getIdResult() {
-        return idResult;
+    @OneToMany(mappedBy = "resultPatient")
+    private java.util.List<ResultDoctor> resultDoctor;
+
+    public String getIdResultPatient() {
+        return idResultPatient;
     }
 
-    public void setIdResult(String idResult) {
-        this.idResult = idResult;
+    public void setIdResultPatient(String idResultPatient) {
+        this.idResultPatient = idResultPatient;
     }
 
     public long getArea() {
@@ -40,14 +42,6 @@ public class Result {
 
     public void setArea(long area) {
         this.area = area;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getDescription() {
@@ -66,6 +60,14 @@ public class Result {
         this.time = time;
     }
 
+    public String getNameType() {
+        return nameType;
+    }
+
+    public void setNameType(String nameType) {
+        this.nameType = nameType;
+    }
+
     public User getUser() {
         return user;
     }
@@ -74,12 +76,12 @@ public class Result {
         this.user = user;
     }
 
-    public Instant getCreatedAt() {
-        return createdAt;
+    public java.util.List<ResultDoctor> getResultDoctor() {
+        return resultDoctor;
     }
 
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
+    public void setResultDoctor(java.util.List<ResultDoctor> resultDoctor) {
+        this.resultDoctor = resultDoctor;
     }
 
 }

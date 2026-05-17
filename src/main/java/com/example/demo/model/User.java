@@ -1,5 +1,7 @@
 package com.example.demo.model;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
@@ -7,6 +9,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,7 +24,8 @@ public class User {
 	private String password;
 	private String address;
 	private int age;
-	private String sex; // gioi tinh
+	private String gender; // gioi tinh, male, female
+	private String phone;
 
 	// n user -> 1 role
 	@ManyToOne
@@ -29,10 +33,11 @@ public class User {
 	@JsonIgnore
 	private Role role;
 
-	// 1 user -> n result
 	@OneToMany(mappedBy = "user")
-	@JsonIgnore
-	private java.util.List<Result> results;
+	private List<ResultPatient> resultPatient;
+
+	@OneToMany(mappedBy = "user")
+	private List<ResultDoctor> resultDoctor;
 
 	public String getName() {
 		return name;
@@ -92,14 +97,6 @@ public class User {
 		this.role = role;
 	}
 
-	public java.util.List<Result> getResults() {
-		return results;
-	}
-
-	public void setResults(java.util.List<Result> results) {
-		this.results = results;
-	}
-
 	public int getAge() {
 		return age;
 	}
@@ -108,12 +105,36 @@ public class User {
 		this.age = age;
 	}
 
-	public String getSex() {
-		return sex;
+	public String getPhone() {
+		return phone;
 	}
 
-	public void setSex(String sex) {
-		this.sex = sex;
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public List<ResultPatient> getResultPatient() {
+		return resultPatient;
+	}
+
+	public void setResultPatient(List<ResultPatient> resultPatient) {
+		this.resultPatient = resultPatient;
+	}
+
+	public List<ResultDoctor> getResultDoctor() {
+		return resultDoctor;
+	}
+
+	public void setResultDoctor(List<ResultDoctor> resultDoctor) {
+		this.resultDoctor = resultDoctor;
 	}
 
 }

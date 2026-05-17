@@ -13,4 +13,8 @@ public interface UserRepository extends JpaRepository<User, String> {
 	public User findByRefreshToken(String refreshToken);
 
 	public Page<User> findAll(org.springframework.data.domain.Pageable pageable);
+
+	public User findByPhone(String phone);
+
+	public Boolean existsByEmail(String email);
 }
