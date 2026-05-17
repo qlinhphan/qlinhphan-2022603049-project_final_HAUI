@@ -23,10 +23,10 @@ def ragOK(question):
     data_text_db = [a['text'] for a in all_data_db]
 
     i_need = i[0]
-    print(i_need)
+    # print(i_need)
 
     text_need_find = [data_text_db[i] for i in i_need]
 
-    print("TEXT fIND: ", text_need_find)
+    # print("TEXT fIND: ", text_need_find)
 
     return text_need_find

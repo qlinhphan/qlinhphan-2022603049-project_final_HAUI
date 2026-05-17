@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import inspect
+import os
+import socket
 from contextlib import asynccontextmanager
 from threading import Lock
 from typing import Any
@@ -70,12 +72,16 @@ from langgraph.graph import END, StateGraph
 class ChatRequest(BaseModel):
     question: str | None = Field(
         default=None,
-        description="Mo ta thong tin benh nhan. Co the bo trong khi tra loi buoc phan tich.",
+        description="Mo ta thong tin benh nhan cho luot hoi dau tien.",
     )
     thread_id: str = Field(default="default", description="Ma phien hoi thoai")
+    rep: str | None = Field(
+        default=None,
+        description="Cau tra loi co/khong khi hoi co muon phan tich them hay khong.",
+    )
     dif: str | None = Field(
         default=None,
-        description="Cau tra loi cho cau hoi phan tich them, vi du: co/khong",
+        description="Ten truong cu, duoc giu lai de tuong thich voi client dang dung dif.",
     )
 
 
@@ -84,9 +90,9 @@ class ChatResponse(BaseModel):
     question: str | None = None
     status: str
     answer: str
-    recommend_rag: str | None = None
-    check_inp: str | None = None
-    analysis: str | None = None
+    check: str | None = None
+    recom: str | None = None
+    ana: str | None = None
     ask_for_analysis: bool = False
     analysis_prompt: str | None = None
 
@@ -112,11 +118,7 @@ class ConversationSessionStore:
 
     def get(self, thread_id: str) -> dict[str, Any]:
         with self._lock:
-            session = self._sessions.get(thread_id)
-            if session is None:
-                session = {}
-                self._sessions[thread_id] = session
-            return dict(session)
+            return dict(self._sessions.get(thread_id, {}))
 
     def update(self, thread_id: str, **values: Any) -> None:
         with self._lock:
@@ -129,7 +131,7 @@ def _wants_analysis(value: str | None) -> bool:
         return False
 
     normalized = value.strip().lower()
-    return normalized in {"co", "có", "cÃ³", "yes", "y", "true", "1"}
+    return normalized in {"co", "có", "cÃ³", "yes", "y", "true", "1"} or "có" in normalized or "co" in normalized
 
 
 def _declines_analysis(value: str | None) -> bool:
@@ -137,66 +139,89 @@ def _declines_analysis(value: str | None) -> bool:
         return False
 
     normalized = value.strip().lower()
-    return normalized in {"khong", "không", "khÃ´ng", "no", "n", "false", "0"}
+    return normalized in {"khong", "không", "khÃ´ng", "no", "n", "false", "0"} or "không" in normalized or "khong" in normalized
+
+
+def _has_required_fields(text: str) -> bool:
+    lowered = text.lower()
+    return all(key in lowered for key in ["name", "age", "gender", "area"])
 
 
 def build_graph():
     memory = MemorySaver()
 
-    agent_check_inp = agent_check_inputs()
-    agent_rag = agent_recommend_via_rags()
+    agent_check = agent_check_inputs()
+    agent_recommend = agent_recommend_via_rags()
     agent_ana = agent_analytical_ad_dis()
 
-    def check_input_node(state: dict[str, Any]) -> dict[str, Any]:
-        result = agent_check_inp.invoke({"input": state["question"]})
-        return {
-            "check_inp": result["output"],
-            "dif": state.get("dif", ""),
-        }
+    def check_node(state: dict[str, Any]) -> dict[str, Any]:
+        if "check" in state:
+            return state
+
+        result = agent_check.invoke({"input": state["ques"]})
+        return {"check": result["output"]}
 
     def recommend_node(state: dict[str, Any]) -> dict[str, Any]:
-        text = state["check_inp"].lower()
+        if "recom" in state:
+            return state
 
-        if any(key not in text for key in ["name", "age", "gender", "area"]):
-            return {
-                "check_inp": state["check_inp"],
-                "recommend_rag": "no rag",
-                "dif": state.get("dif", ""),
-            }
-
-        result = agent_rag.invoke({"input": state["check_inp"]})
+        result = agent_recommend.invoke({"input": state["check"]})
         return {
-            "check_inp": state["check_inp"],
-            "recommend_rag": result["output"],
-            "dif": state.get("dif", ""),
+            "check": state["check"],
+            "recom": result["output"],
         }
 
-    def route_after_recommend(state: dict[str, Any]):
-        if _wants_analysis(state.get("dif")):
-            return "analysis"
+    def route_recommend(state: dict[str, Any]):
+        if _has_required_fields(state["check"]):
+            return "r"
         return END
 
     def analysis_node(state: dict[str, Any]) -> dict[str, Any]:
-        result = agent_ana.invoke({"input": state["recommend_rag"]})
-        return {"ana": result["output"]}
+        result = agent_ana.invoke({"input": state["recom"]})
+        return {
+            "check": state["check"],
+            "recom": state["recom"],
+            "ana": result["output"],
+        }
+
+    def route_analysis(state: dict[str, Any]):
+        if _wants_analysis(state.get("rep")):
+            return "a"
+        return END
 
     graph = StateGraph(dict)
-    graph.add_node("check_input", check_input_node)
-    graph.add_node("recommend", recommend_node)
-    graph.add_node("analysis", analysis_node)
+    graph.add_node("c", check_node)
+    graph.add_node("r", recommend_node)
+    graph.add_node("a", analysis_node)
 
-    graph.set_entry_point("check_input")
-    graph.add_edge("check_input", "recommend")
+    graph.set_entry_point("c")
     graph.add_conditional_edges(
-        "recommend",
-        route_after_recommend,
-        {"analysis": "analysis", END: END},
+        "c",
+        route_recommend,
+        {"r": "r", END: END},
+    )
+    graph.add_conditional_edges(
+        "r",
+        route_analysis,
+        {"a": "a", END: END},
     )
 
     return graph.compile(checkpointer=memory)
 
 
-app = FastAPI(title="Medical RAG API", version="1.1.0")
+def _pick_available_port(preferred_port: int, max_attempts: int = 10) -> int:
+    for port in range(preferred_port, preferred_port + max_attempts):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            if sock.connect_ex(("127.0.0.1", port)) != 0:
+                return port
+
+    raise RuntimeError(
+        f"Khong tim duoc cong trong trong khoang {preferred_port}-{preferred_port + max_attempts - 1}."
+    )
+
+
+app = FastAPI(title="Medical RAG API Different", version="1.0.0")
 graph_store = GraphSessionStore()
 conversation_store = ConversationSessionStore()
 
@@ -214,7 +239,7 @@ app.add_middleware(
 
 @app.get("/")
 def root() -> dict[str, str]:
-    return {"message": "Medical RAG API is running"}
+    return {"message": "Medical RAG API Different is running"}
 
 
 @app.get("/health")
@@ -228,94 +253,102 @@ def chat(request: ChatRequest) -> ChatResponse:
         app_graph = graph_store.get(request.thread_id)
         config = {"configurable": {"thread_id": request.thread_id}}
         session = conversation_store.get(request.thread_id)
+        analysis_reply = request.rep if request.rep is not None else request.dif
 
-        if request.dif is not None:
+        if analysis_reply is not None:
             if not session.get("awaiting_analysis"):
                 raise HTTPException(
                     status_code=400,
                     detail="Khong co yeu cau phan tich nao dang cho o thread_id nay.",
                 )
 
-            if _wants_analysis(request.dif):
-                last_question = session.get("last_question")
-                if not last_question:
-                    raise HTTPException(
-                        status_code=400,
-                        detail="Khong tim thay cau hoi truoc do de phan tich tiep.",
-                    )
-
-                final_result = app_graph.invoke(
-                    {"question": last_question, "dif": request.dif},
-                    config=config,
+            last_question = session.get("last_question")
+            last_check = session.get("last_check")
+            last_recom = session.get("last_recom")
+            if not last_question or not last_check or not last_recom:
+                raise HTTPException(
+                    status_code=400,
+                    detail="Khong tim thay du lieu truoc do de tiep tuc phan tich.",
                 )
-                conversation_store.update(request.thread_id, awaiting_analysis=False)
+
+            result = app_graph.invoke(
+                {
+                    "ques": last_question,
+                    "rep": analysis_reply,
+                    "check": last_check,
+                    "recom": last_recom,
+                },
+                config=config,
+            )
+
+            conversation_store.update(request.thread_id, awaiting_analysis=False)
+
+            if "ana" in result:
                 return ChatResponse(
                     thread_id=request.thread_id,
                     question=last_question,
                     status="answered_with_analysis",
-                    answer=final_result.get("ana", session.get("last_recommend_rag", "")),
-                    check_inp=session.get("last_check_inp"),
-                    recommend_rag=session.get("last_recommend_rag"),
-                    analysis=final_result.get("ana"),
+                    answer=result["ana"],
+                    check=result.get("check"),
+                    recom=result.get("recom"),
+                    ana=result.get("ana"),
                 )
 
-            if _declines_analysis(request.dif):
-                conversation_store.update(request.thread_id, awaiting_analysis=False)
-                return ChatResponse(
-                    thread_id=request.thread_id,
-                    question=session.get("last_question"),
-                    status="analysis_skipped",
-                    answer=session.get("last_recommend_rag", ""),
-                    check_inp=session.get("last_check_inp"),
-                    recommend_rag=session.get("last_recommend_rag"),
+            if not _declines_analysis(analysis_reply):
+                raise HTTPException(
+                    status_code=400,
+                    detail="Gia tri rep/dif khong hop le. Hay gui co/khong.",
                 )
 
-            raise HTTPException(
-                status_code=400,
-                detail="Gia tri dif khong hop le. Hay gui co/khong.",
+            return ChatResponse(
+                thread_id=request.thread_id,
+                question=last_question,
+                status="analysis_skipped",
+                answer=last_recom,
+                check=last_check,
+                recom=last_recom,
             )
 
         if not request.question or not request.question.strip():
             raise HTTPException(
                 status_code=400,
-                detail="Can gui question o lan hoi dau tien.",
+                detail="Cần gửi req ở lần hỏi đầu tiên.",
             )
 
-        first_result = app_graph.invoke({"question": request.question}, config=config)
+        result = app_graph.invoke({"ques": request.question}, config=config)
 
-        if first_result["recommend_rag"] == "no rag":
+        if "recom" not in result:
             conversation_store.update(
                 request.thread_id,
                 last_question=request.question,
-                last_check_inp=first_result["check_inp"],
-                last_recommend_rag=None,
+                last_check=result.get("check"),
+                last_recom=None,
                 awaiting_analysis=False,
             )
             return ChatResponse(
                 thread_id=request.thread_id,
                 question=request.question,
                 status="need_more_info",
-                answer=first_result["check_inp"],
-                check_inp=first_result["check_inp"],
-                recommend_rag=first_result["recommend_rag"],
+                answer=result["check"],
+                check=result.get("check"),
             )
 
         conversation_store.update(
             request.thread_id,
             last_question=request.question,
-            last_check_inp=first_result["check_inp"],
-            last_recommend_rag=first_result["recommend_rag"],
+            last_check=result.get("check"),
+            last_recom=result.get("recom"),
             awaiting_analysis=True,
         )
         return ChatResponse(
             thread_id=request.thread_id,
             question=request.question,
             status="answered",
-            answer=first_result["recommend_rag"],
-            check_inp=first_result["check_inp"],
-            recommend_rag=first_result["recommend_rag"],
+            answer=result["recom"],
+            check=result.get("check"),
+            recom=result.get("recom"),
             ask_for_analysis=True,
-            analysis_prompt="Bạn có muốn phân tích ưu/nhược của các phương pháp này không?",
+            analysis_prompt="Bạn có muốn phân tich ưu điểm, nhược điểm của các phương pháp này không? (có/không)",
         )
     except Exception as exc:
         if isinstance(exc, HTTPException):
@@ -326,4 +359,12 @@ def chat(request: ChatRequest) -> ChatResponse:
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run("api:app", host="0.0.0.0", port=8001, reload=False)
+    preferred_port = int(os.getenv("API_DIFFERENT_PORT", "8002"))
+    port = _pick_available_port(preferred_port)
+
+    if port != preferred_port:
+        print(f"Port {preferred_port} dang duoc su dung, chuyen sang port {port}.")
+
+    uvicorn.run("api_different:app", host="0.0.0.0", port=port, reload=False)
+
+# python api_different.py
