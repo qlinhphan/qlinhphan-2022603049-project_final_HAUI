@@ -8,7 +8,8 @@ import {
     TrendingUp,
     Users,
 } from "lucide-react";
-import { useLocation, useNavigate } from "react-router";
+import SharedAdminSidebar from "../components/AdminSidebar";
+import Header from "../header";
 
 const styles = {
     page: {
@@ -334,10 +335,10 @@ const styles = {
 };
 
 const sidebarItems = [
-    { label: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
-    { label: "Quan ly nguoi dung", path: "/admin", icon: Users },
-    { label: "Quan ly benh an", path: "/admin/patients", icon: FileText },
-    { label: "Quan ly role", path: "/admin/roles", icon: ShieldCheck },
+    { label: "Thống kê", path: "/admin/dashboard", icon: LayoutDashboard },
+    { label: "Quản lý người dùng", path: "/admin", icon: Users },
+    { label: "Quản lý bệnh án", path: "/admin/patients", icon: FileText },
+    { label: "Quản lý role", path: "/admin/roles", icon: ShieldCheck },
 ];
 
 const roleData = [
@@ -366,47 +367,13 @@ const patientData = [
 ];
 
 const AdminSidebar = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-
     return (
-        <aside style={styles.sidebar}>
-            <div style={styles.brand}>
-                <div style={styles.brandTitle}>Admin Dashboard</div>
-                <p style={styles.brandText}>
-                    Theo doi nhanh toan bo he thong tu mot man hinh tong quan truoc khi di vao tung module.
-                </p>
-            </div>
-
-            {sidebarItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = location.pathname === item.path;
-
-                return (
-                    <button
-                        key={item.path}
-                        type="button"
-                        onClick={() => navigate(item.path)}
-                        style={{
-                            ...styles.menuButton,
-                            background: isActive ? "#ffffff" : "transparent",
-                            color: isActive ? "#123c69" : "#ffffff",
-                            boxShadow: isActive ? "0 12px 30px rgba(7, 22, 39, 0.18)" : "none",
-                        }}
-                    >
-                        <Icon size={20} />
-                        <span>{item.label}</span>
-                    </button>
-                );
-            })}
-
-            <div style={styles.sidebarCard}>
-                <p style={styles.sidebarCardTitle}>Tong quan hom nay</p>
-                <p style={styles.sidebarCardText}>
-                    He thong dang co {roleData.length} role, {doctorData.length} bac si va {patientData.length} ho so benh nhan mau.
-                </p>
-            </div>
-        </aside>
+        <SharedAdminSidebar
+            title="Admin Dashboard"
+            description="Theo doi nhanh toan bo he thong tu mot man hinh tong quan truoc khi di vao tung module."
+            footerTitle="Tong quan hom nay"
+            footerText={`He thong dang co ${roleData.length} role, ${doctorData.length} bac si va ${patientData.length} ho so benh nhan mau.`}
+        />
     );
 };
 
@@ -501,23 +468,13 @@ const ManageDashboard = () => {
 
     return (
         <div style={styles.page}>
-            <div
-                style={{
-                    ...styles.shell,
-                    gridTemplateColumns:
-                        typeof window !== "undefined" && window.innerWidth < 992 ? "1fr" : styles.shell.gridTemplateColumns,
-                }}
-            >
+            <div style={styles.shell}>
                 <AdminSidebar />
 
                 <main style={styles.content}>
-                    <section
-                        style={{
-                            ...styles.hero,
-                            gridTemplateColumns:
-                                typeof window !== "undefined" && window.innerWidth < 1180 ? "1fr" : styles.hero.gridTemplateColumns,
-                        }}
-                    >
+                    <Header />
+
+                    <section style={styles.hero}>
                         <div style={styles.heroGlow} />
 
                         <div style={styles.heroContent}>
@@ -532,13 +489,7 @@ const ManageDashboard = () => {
                             </p>
                         </div>
 
-                        <div
-                            style={{
-                                ...styles.heroMiniGrid,
-                                gridTemplateColumns:
-                                    typeof window !== "undefined" && window.innerWidth < 640 ? "1fr" : styles.heroMiniGrid.gridTemplateColumns,
-                            }}
-                        >
+                            <div style={styles.heroMiniGrid}>
                             <div style={styles.heroMiniCard}>
                                 <span style={styles.heroMiniLabel}>Tong thanh vien he thong</span>
                                 <div style={styles.heroMiniValue}>{roleData.reduce((sum, item) => sum + item.members, 0)}</div>
@@ -550,13 +501,7 @@ const ManageDashboard = () => {
                         </div>
                     </section>
 
-                    <section
-                        style={{
-                            ...styles.statGrid,
-                            gridTemplateColumns:
-                                typeof window !== "undefined" && window.innerWidth < 1100 ? "1fr" : styles.statGrid.gridTemplateColumns,
-                        }}
-                    >
+                    <section style={styles.statGrid}>
                         {statCards.map((item) => {
                             const Icon = item.icon;
 
@@ -580,13 +525,7 @@ const ManageDashboard = () => {
                         })}
                     </section>
 
-                    <section
-                        style={{
-                            ...styles.lowerGrid,
-                            gridTemplateColumns:
-                                typeof window !== "undefined" && window.innerWidth < 1100 ? "1fr" : styles.lowerGrid.gridTemplateColumns,
-                        }}
-                    >
+                    <section style={styles.lowerGrid}>
                         <div style={styles.panel}>
                             <div style={styles.panelHeader}>
                                 <div>

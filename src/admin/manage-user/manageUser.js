@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { Eye, FileText, LayoutDashboard, Pencil, Plus, ShieldCheck, Trash2, UserCog, Users } from "lucide-react";
-import { useLocation, useNavigate } from "react-router";
+import { FileText, LayoutDashboard, Pencil, Plus, ShieldCheck, UserCog, Users } from "lucide-react";
 import TableUsers from "./tableUser";
 import CreateUser from "./createUser";
-import { apiCreateUser } from "../../axios/user";
+import { apiCreateUser, getAllUserAndPage } from "../../axios/user";
+import DeleteUser from "./deleteUser";
+import { useSelector } from "react-redux";
+import SharedAdminSidebar from "../components/AdminSidebar";
+import Header from "../header";
 
 const adminShellStyles = {
     page: {
@@ -312,10 +315,10 @@ const adminShellStyles = {
 };
 
 const sidebarItems = [
-    { label: "Dashboard", path: "/admin/dashboard", icon: LayoutDashboard },
-    { label: "Quan ly nguoi dung", path: "/admin", icon: Users },
-    { label: "Quan ly benh an", path: "/admin/patients", icon: FileText },
-    { label: "Quan ly role", path: "/admin/roles", icon: ShieldCheck },
+    { label: "Thống kê", path: "/admin/dashboard", icon: LayoutDashboard },
+    { label: "Quản lý người dùng", path: "/admin", icon: Users },
+    { label: "Quản lý bệnh án", path: "/admin/patients", icon: FileText },
+    { label: "Quản lý role", path: "/admin/roles", icon: ShieldCheck },
 ];
 
 const statusColors = {
@@ -323,43 +326,23 @@ const statusColors = {
     Inactive: { color: "#b42318", background: "#fff1f0" },
 };
 
-const initialUsers = [
-    {
-        id: "USR-001",
-        fullName: "Nguyen Van An",
-        email: "an.nguyen@hospital.vn",
-        phone: "0901234567",
-        role: "Admin",
-        status: "Active",
-    },
-    {
-        id: "USR-002",
-        fullName: "Tran Thi Binh",
-        email: "binh.tran@hospital.vn",
-        phone: "0912345678",
-        role: "Doctor",
-        status: "Active",
-    },
-    {
-        id: "USR-003",
-        fullName: "Le Hoang Minh",
-        email: "minh.le@hospital.vn",
-        phone: "0987654321",
-        role: "Receptionist",
-        status: "Inactive",
-    },
-];
-
 const emptyUserForm = {
     email: "",
     name: "",
     address: "",
     phone: "",
-    roleName: "Doctor",
+    roleName: "doctor",
     age: "",
-    sex: "",
+    gender: "male",
     password: "",
 };
+
+const normalizeUserForm = (data = {}) => ({
+    ...emptyUserForm,
+    ...data,
+    roleName: String(data?.roleName ?? emptyUserForm.roleName).toLowerCase(),
+    gender: String(data?.gender ?? emptyUserForm.gender).toLowerCase(),
+});
 
 const renderStatusBadge = (value) => {
     const color = statusColors[value] || { color: "#123c69", background: "#eef6ff" };
@@ -371,78 +354,45 @@ const renderStatusBadge = (value) => {
 };
 
 const AdminSidebar = () => {
-    const navigate = useNavigate();
-    const location = useLocation();
-
     return (
-        <aside style={adminShellStyles.sidebar}>
-            <div style={adminShellStyles.brand}>
-                <div style={adminShellStyles.brandTitle}>Admin Dashboard</div>
-                <p style={adminShellStyles.brandText}>
-                    Khu vuc quan tri nay gom dashboard tong quan, nguoi dung, benh an va role de quan ly tap trung.
-                </p>
-            </div>
-
-            {sidebarItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = location.pathname === item.path;
-
-                return (
-                    <button
-                        key={item.path}
-                        type="button"
-                        onClick={() => navigate(item.path)}
-                        style={{
-                            ...adminShellStyles.menuButton,
-                            background: isActive ? "#ffffff" : "transparent",
-                            color: isActive ? "#123c69" : "#ffffff",
-                            boxShadow: isActive ? "0 12px 30px rgba(7, 22, 39, 0.18)" : "none",
-                        }}
-                    >
-                        <Icon size={20} />
-                        <span>{item.label}</span>
-                    </button>
-                );
-            })}
-
-            <div
-                style={{
-                    marginTop: "28px",
-                    borderRadius: "20px",
-                    padding: "18px",
-                    background: "rgba(255,255,255,0.08)",
-                }}
-            >
-                <div style={{ fontWeight: 700, marginBottom: "8px" }}>Tong quan nhanh</div>
-                <p style={{ margin: 0, color: "rgba(255,255,255,0.72)", lineHeight: 1.6, fontSize: "14px" }}>
-                    Dashboard moi giup xem nhanh cac chi so truoc khi di vao tung man hinh quan ly.
-                </p>
-            </div>
-        </aside>
+        <SharedAdminSidebar
+            title="Admin Dashboard"
+            description="Khu vuc quan tri nay gom dashboard tong quan, nguoi dung, benh an va role de quan ly tap trung."
+            footerTitle="Tong quan nhanh"
+            footerText="Dashboard moi giup xem nhanh cac chi so truoc khi di vao tung man hinh quan ly."
+        />
     );
 };
 
 const ManageUser = () => {
-    const [users, setUsers] = useState(initialUsers);
-    const [selectedId, setSelectedId] = useState(initialUsers[0]?.id || null);
+    const [selectedId, setSelectedId] = useState(null);
     const [modalMode, setModalMode] = useState("");
     const [formData, setFormData] = useState(emptyUserForm);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+    const [successPopupContent, setSuccessPopupContent] = useState({
+        title: "Đăng ký thành công",
+        text: "Người dùng mới đã được đăng ký thành công.",
+    });
+    const [usersDB, setUsersDB] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalObj, setTotalObj] = useState(0);
+    const pageLimit = 5;
 
     const selectedItem = useMemo(
-        () => users.find((item) => item.id === selectedId) || users[0] || null,
-        [selectedId, users]
+        () => usersDB.find((item) => (item.id || item.idUser) === selectedId) || usersDB[0] || null,
+        [selectedId, usersDB]
     );
 
     const summaryData = [
-        { label: "Tong nguoi dung", value: users.length },
-        { label: "Dang hoat dong", value: users.filter((item) => item.status === "Active").length },
-        { label: "Tam khoa", value: users.filter((item) => item.status === "Inactive").length },
+        { label: "Tổng người dùng", value: totalObj },
+        { label: "Số bản ghi của trang", value: usersDB.length },
+        { label: "Tổng số trang", value: totalPages },
     ];
 
     const openModal = (mode) => {
         setModalMode(mode);
-        setFormData(mode === "edit" && selectedItem ? { ...selectedItem } : { ...emptyUserForm });
+        setFormData(mode === "edit" && selectedItem ? normalizeUserForm(selectedItem) : { ...emptyUserForm });
     };
 
     const closeModal = () => {
@@ -462,83 +412,125 @@ const ManageUser = () => {
     }, [showSuccessPopup]);
 
     const handleSubmit = async () => {
-        // if (!formData.id.trim()) {
-        //     return;
-        // }
+        if (modalMode === "edit") {
+            console.warn("Edit user API is not implemented yet.");
+            setSuccessPopupContent({
+                title: "Cập nhật chưa sẵn sàng",
+                text: "Chức năng cập nhật người dùng hiện chưa được cài đặt.",
+            });
+            setShowSuccessPopup(true);
+            return;
+        }
 
-        // if (modalMode === "edit") {
-        //     setUsers((prev) => prev.map((item) => (item.id === formData.id ? formData : item)));
-        // } else {
-        //     setUsers((prev) => [formData, ...prev]);
-        // }
+        const normalizedFormData = normalizeUserForm(formData);
 
-        // setSelectedId(formData.id);
-        console.log("Saved data:", formData);
+        if (!normalizedFormData.email.trim() || !normalizedFormData.password.trim() || !String(normalizedFormData.age).trim()) {
+            console.warn("Create user blocked: missing required fields", normalizedFormData);
+            setSuccessPopupContent({
+                title: "Thiếu thông tin bắt buộc",
+                text: "Vui lòng nhập đầy đủ email, mật khẩu và tuổi.",
+            });
+            setShowSuccessPopup(true);
+            return;
+        }
+
+        console.log("handleSubmit called", { modalMode, formData });
+        console.log("Create user payload:", normalizedFormData);
 
         try {
+            console.log("Calling apiCreateUser...");
             await apiCreateUser(
-                formData.age,
-                formData.address,
-                formData.email,
-                formData.name,
-                formData.password,
-                formData.sex,
-                formData.roleName,
-                formData.phone
+                accessToken,
+                normalizedFormData.age,
+                normalizedFormData.address,
+                normalizedFormData.email,
+                normalizedFormData.name,
+                normalizedFormData.password,
+                normalizedFormData.gender,
+                normalizedFormData.roleName,
+                normalizedFormData.phone
             );
 
-            console.log("ok you");
+            console.log("apiCreateUser succeeded");
+            await allUserAndPage(1);
             closeModal();
+            setFormData({ ...emptyUserForm });
+            setSuccessPopupContent({
+                title: "Tạo mới thành công",
+                text: "Người dùng mới đã được đăng ký thành công.",
+            });
             setShowSuccessPopup(true);
         } catch (error) {
             console.error("Create user failed:", error);
+            const errorMessage =
+                error?.response?.data?.message ||
+                error?.message ||
+                "Thêm mới người dùng thất bại.";
+            setSuccessPopupContent({
+                title: "Tạo mới thất bại",
+                text: errorMessage,
+            });
+            setSuccessPopupContent({
+                title: "Tạo mới thất bại",
+                text: "Thêm mới người dùng thất bại.",
+            });
+            setShowSuccessPopup(true);
+            setSuccessPopupContent({
+                title: "Tạo mới thất bại",
+                text: errorMessage,
+            });
         }
     };
 
-    const handleDelete = () => {
-        if (!selectedItem) {
-            return;
-        }
+    const accessToken = useSelector((state) => state.user.user.accessToken);
+    const allUserAndPage = async (page = 1) => {
+        try {
+            const rs = await getAllUserAndPage(accessToken, page, pageLimit);
+            const payload = rs?.data?.message ?? rs?.data ?? {};
+            const userList = payload?.allUser ?? [];
+            const nextTotalPages = Number(payload?.totalPages ?? 1);
+            const nextTotalObj = Number(payload?.totalObj ?? 0);
 
-        const canDelete = window.confirm(`Ban co chac muon xoa ${selectedItem.fullName} khong?`);
-        if (!canDelete) {
-            return;
+            console.log("CHECK::", payload);
+            setUsersDB(Array.isArray(userList) ? userList : []);
+            setCurrentPage(page);
+            setTotalPages(Number(nextTotalPages) > 0 ? Number(nextTotalPages) : 1);
+            setTotalObj(Number(nextTotalObj) >= 0 ? Number(nextTotalObj) : 0);
+            setSelectedId((Array.isArray(userList) && userList[0] && (userList[0].id || userList[0].idUser)) || null);
+        } catch (error) {
+            console.error("Get users failed:", error);
+            setUsersDB([]);
+            setTotalPages(1);
+            setTotalObj(0);
+            setSelectedId(null);
         }
-
-        const nextUsers = users.filter((item) => item.id !== selectedItem.id);
-        setUsers(nextUsers);
-        setSelectedId(nextUsers[0]?.id || null);
     };
 
-
-    const [usersDB, setUsersDB] = useState([])
+    useEffect(() => {
+        allUserAndPage(1)
+        // console.log("CHECK USER: GET ALL USERS")
+    }, [])
 
     return (
         <div style={adminShellStyles.page}>
             {showSuccessPopup && (
                 <div style={adminShellStyles.successPopup}>
-                    <p style={adminShellStyles.successPopupTitle}>Đăng ký thành công</p>
-                    <p style={adminShellStyles.successPopupText}>
-                        Người dùng mới đã được đăng ký thành công.
-                    </p>
+                    <p style={adminShellStyles.successPopupTitle}>{successPopupContent.title}</p>
+                    <p style={adminShellStyles.successPopupText}>{successPopupContent.text}</p>
                 </div>
             )}
 
-            <div
-                style={{
-                    ...adminShellStyles.shell,
-                    gridTemplateColumns:
-                        typeof window !== "undefined" && window.innerWidth < 992 ? "1fr" : adminShellStyles.shell.gridTemplateColumns,
-                }}
-            >
+            <div style={adminShellStyles.shell}>
                 <AdminSidebar />
 
                 <main style={adminShellStyles.content}>
+                    <Header />
+
                     <section style={adminShellStyles.hero}>
                         <div>
-                            <h1 style={adminShellStyles.heroTitle}>Quan ly nguoi dung</h1>
+                            <h1 style={adminShellStyles.heroTitle}>Quản lý người dùng</h1>
                             <p style={adminShellStyles.heroText}>
-                                Theo doi danh sach tai khoan, phan role va cap nhat nhanh thong tin nguoi dung trong he thong.
+                                Theo dõi danh sách tài khoản, phân role và cập nhật nhanh thông tin người dùng trong hệ thống.
                             </p>
                         </div>
 
@@ -576,32 +568,43 @@ const ManageUser = () => {
                                     <Pencil size={18} />
                                     Sửa
                                 </button>
-                                <button
-                                    type="button"
-                                    onClick={handleDelete}
-                                    style={{ ...adminShellStyles.actionButton, ...adminShellStyles.dangerButton }}
-                                >
-                                    <Trash2 size={18} />
-                                    Xóa
-                                </button>
+                                <DeleteUser
+                                    adminShellStyles={adminShellStyles}
+                                    usersDB={usersDB}
+                                    selectedItem={selectedItem}
+                                    setUsersDB={setUsersDB}
+                                    setSelectedId={setSelectedId}
+                                    setTotalObj={setTotalObj}
+                                    setSuccessPopupContent={setSuccessPopupContent}
+                                    setShowSuccessPopup={setShowSuccessPopup}
+                                    allUserAndPage={allUserAndPage}
+                                    pageLimit={pageLimit}
+                                    setCurrentPage={setCurrentPage}
+                                    setTotalPages={setTotalPages}
+                                />
                             </div>
                         </div>
 
-                        <TableUsers adminShellStyles={adminShellStyles}
-                            setSelectedId={setSelectedId} usersDB={usersDB} selectedItem={selectedItem} setSelectedId={setSelectedId}
-
-                        ></TableUsers>
+                        <TableUsers
+                            adminShellStyles={adminShellStyles}
+                            setSelectedId={setSelectedId}
+                            usersDB={usersDB}
+                            selectedItem={selectedItem}
+                            setUsersDB={setUsersDB}
+                            setTotalObj={setTotalObj}
+                            setSuccessPopupContent={setSuccessPopupContent}
+                            setShowSuccessPopup={setShowSuccessPopup}
+                            allUserAndPage={allUserAndPage}
+                            currentPage={currentPage}
+                            totalPages={totalPages}
+                            totalObj={totalObj}
+                            onPageChange={allUserAndPage}
+                        />
                     </section>
 
-                    <section
-                        style={{
-                            ...adminShellStyles.detailGrid,
-                            gridTemplateColumns:
-                                typeof window !== "undefined" && window.innerWidth < 1100 ? "1fr" : adminShellStyles.detailGrid.gridTemplateColumns,
-                        }}
-                    >
+                    <section style={adminShellStyles.detailGrid}>
                         <div style={adminShellStyles.detailCard}>
-                            <h3 style={adminShellStyles.detailTitle}>Thong tin chi tiet</h3>
+                            <h3 style={adminShellStyles.detailTitle}>Thông tin chi tiết</h3>
                             {selectedItem ? (
                                 Object.entries(selectedItem).map(([key, value]) => (
                                     <div key={key} style={adminShellStyles.detailRow}>
@@ -616,7 +619,7 @@ const ManageUser = () => {
                             )}
                         </div>
 
-                        <div style={adminShellStyles.sideInfo}>
+                        {/* <div style={adminShellStyles.sideInfo}>
                             <div
                                 style={{
                                     width: "56px",
@@ -635,7 +638,7 @@ const ManageUser = () => {
                             <p style={{ margin: 0, color: "#5f7285", lineHeight: 1.7 }}>
                                 File nay chi xu ly module nguoi dung. Viec them, sua, xoa va xem chi tiet deu duoc dat rieng trong trang nay.
                             </p>
-                        </div>
+                        </div> */}
                     </section>
                 </main>
             </div>

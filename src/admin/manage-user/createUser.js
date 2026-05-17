@@ -6,6 +6,8 @@ const CreateUser = ({
     closeModal,
     handleSubmit,
 }) => {
+    const isSubmitDisabled = !formData.email.trim() || !formData.password.trim() || !String(formData.age).trim();
+
     return (
         <div>
             {modalMode && (
@@ -17,8 +19,10 @@ const CreateUser = ({
 
                         <div style={adminShellStyles.formGrid}>
                             <div style={adminShellStyles.field}>
-                                <label style={adminShellStyles.label}>Email</label>
+                                <label style={adminShellStyles.label}>Email *</label>
                                 <input
+                                    type="email"
+                                    required
                                     style={adminShellStyles.input}
                                     value={formData.email}
                                     onChange={(event) => setFormData((prev) => ({ ...prev, email: event.target.value }))}
@@ -55,8 +59,8 @@ const CreateUser = ({
                                     value={formData.roleName}
                                     onChange={(event) => setFormData((prev) => ({ ...prev, roleName: event.target.value }))}
                                 >
-                                    <option value="Admin">Admin</option>
-                                    <option value="Doctor">Doctor</option>
+                                    <option value="admin">Admin</option>
+                                    <option value="doctor">Doctor</option>
                                     {/* <option value="Receptionist">Receptionist</option> */}
                                 </select>
                             </div>
@@ -64,6 +68,8 @@ const CreateUser = ({
                             <div style={adminShellStyles.field}>
                                 <label style={adminShellStyles.label}>Mật khẩu</label>
                                 <input
+                                    type="password"
+                                    required
                                     style={adminShellStyles.input}
                                     value={formData.password}
                                     onChange={(event) => setFormData((prev) => ({ ...prev, password: event.target.value }))}
@@ -72,6 +78,9 @@ const CreateUser = ({
                             <div style={adminShellStyles.field}>
                                 <label style={adminShellStyles.label}>Tuổi</label>
                                 <input
+                                    type="number"
+                                    min="0"
+                                    required
                                     style={adminShellStyles.input}
                                     value={formData.age}
                                     onChange={(event) => setFormData((prev) => ({ ...prev, age: event.target.value }))}
@@ -81,11 +90,11 @@ const CreateUser = ({
                                 <label style={adminShellStyles.label}>Giới tính</label>
                                 <select
                                     style={adminShellStyles.input}
-                                    value={formData.sex}
-                                    onChange={(event) => setFormData((prev) => ({ ...prev, sex: event.target.value }))}
+                                    value={formData.gender}
+                                    onChange={(event) => setFormData((prev) => ({ ...prev, gender: event.target.value }))}
                                 >
-                                    <option value="Nam">Nam</option>
-                                    <option value="Nữ">Nữ</option>
+                                    <option value="male">Nam</option>
+                                    <option value="female">Nữ</option>
                                     {/* <option value="Receptionist">Receptionist</option> */}
                                 </select>
                             </div>
@@ -105,7 +114,13 @@ const CreateUser = ({
                             <button
                                 type="button"
                                 onClick={handleSubmit}
-                                style={{ ...adminShellStyles.actionButton, ...adminShellStyles.primaryButton }}
+                                disabled={isSubmitDisabled}
+                                style={{
+                                    ...adminShellStyles.actionButton,
+                                    ...adminShellStyles.primaryButton,
+                                    opacity: isSubmitDisabled ? 0.6 : 1,
+                                    cursor: isSubmitDisabled ? "not-allowed" : "pointer",
+                                }}
                             >
                                 Luu thong tin
                             </button>

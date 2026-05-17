@@ -1,3 +1,4 @@
+// import { img } from '../../../public/image.png'
 const IntroClient = () => {
     return (
         <div>

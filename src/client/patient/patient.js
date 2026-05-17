@@ -1,167 +1,88 @@
-import React, { useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
+import { useSelector } from "react-redux";
+import { apiGetDetail } from "../../axios/analy";
 
-const patientRecords = [
-    {
-        id: "BN-1024",
-        name: "Nguyen Thi Minh Anh",
-        age: 46,
-        gender: "Nữ",
-        phone: "0903 456 120",
-        doctor: "BS. Tran Quoc Bao",
-        latestVisit: "2026-04-12",
-        riskLevel: "Cần theo dõi sát",
-        diagnosis: "Nghi ngờ u thần kinh đệm thùy trán",
-        visitCount: 4,
-        note: "Bệnh nhân đáp ứng tốt với phác đồ theo dõi hình ảnh định kỳ.",
-        visits: [
-            {
-                date: "2026-04-12",
-                type: "Tái khám",
-                finding: "Khối bất thường ổn định kích thước, chưa ghi nhận tiến triển rõ.",
-                impression: "Tiếp tục theo dõi bằng MRI trong 6 tuần.",
-            },
-            {
-                date: "2026-03-08",
-                type: "Đánh giá chuyên sâu",
-                finding: "Phát hiện tổn thương nghi ngờ vùng thùy trán trái, bờ không đều.",
-                impression: "Khuyến nghị hội chẩn ngoại thần kinh và đối chiếu thêm MRI có cản quang.",
-            },
-            {
-                date: "2026-01-20",
-                type: "Khám ban đầu",
-                finding: "Đau đầu kéo dài, có dấu hiệu thần kinh khu trú nhẹ.",
-                impression: "Chỉ định chụp MRI sọ não để đánh giá tổn thương nội sọ.",
-            },
-            {
-                date: "2025-12-02",
-                type: "Tư vấn",
-                finding: "Theo dõi triệu chứng đau đầu và thay đổi thị lực thoáng qua.",
-                impression: "Hẹn tái khám nếu triệu chứng tiến triển.",
-            },
-        ],
-    },
-    {
-        id: "BN-1051",
-        name: "Le Hoang Nam",
-        age: 58,
-        gender: "Nam",
-        phone: "0918 772 456",
-        doctor: "BS. Tran Quoc Bao",
-        latestVisit: "2026-04-10",
-        riskLevel: "Nguy cơ trung bình",
-        diagnosis: "Tổn thương nghi màng não vùng thái dương",
-        visitCount: 3,
-        note: "Cần đối chiếu thêm kết quả sinh thiết nếu có chỉ định.",
-        visits: [
-            {
-                date: "2026-04-10",
-                type: "Tái khám",
-                finding: "Tổn thương tăng quang nhẹ, chưa có dấu hiệu chèn ép đáng kể.",
-                impression: "Tiếp tục theo dõi đáp ứng điều trị và triệu chứng lâm sàng.",
-            },
-            {
-                date: "2026-02-18",
-                type: "Chẩn đoán hình ảnh",
-                finding: "Khối ngoài trục ranh giới tương đối rõ vùng thái dương phải.",
-                impression: "Ưu tiên theo dõi meningioma, cần đánh giá thêm mức độ xâm lấn.",
-            },
-            {
-                date: "2026-01-05",
-                type: "Khám ban đầu",
-                finding: "Bệnh nhân chóng mặt, đau đầu từng cơn.",
-                impression: "Chỉ định CT và MRI sọ não.",
-            },
-        ],
-    },
-    {
-        id: "BN-1088",
-        name: "Pham Gia Han",
-        age: 35,
-        gender: "Nữ",
-        phone: "0982 555 902",
-        doctor: "BS. Nguyen Hai Dang",
-        latestVisit: "2026-04-15",
-        riskLevel: "Ổn định",
-        diagnosis: "Theo dõi sau điều trị u tuyến yên",
-        visitCount: 5,
-        note: "Hồ sơ theo dõi dài hạn với đáp ứng điều trị tích cực.",
-        visits: [
-            {
-                date: "2026-04-15",
-                type: "Tái khám",
-                finding: "Không ghi nhận tái phát rõ trên hình ảnh hiện tại.",
-                impression: "Duy trì lịch tái khám định kỳ mỗi 3 tháng.",
-            },
-            {
-                date: "2026-02-12",
-                type: "Theo dõi sau điều trị",
-                finding: "Vùng sau mổ ổn định, không có phù nề mới.",
-                impression: "Tiên lượng thuận lợi, tiếp tục theo dõi nội tiết.",
-            },
-            {
-                date: "2025-11-30",
-                type: "Đánh giá định kỳ",
-                finding: "Mô còn lại kích thước nhỏ, không tiến triển.",
-                impression: "Tiếp tục kiểm soát triệu chứng và theo dõi MRI.",
-            },
-            {
-                date: "2025-08-16",
-                type: "Sau phẫu thuật",
-                finding: "Hậu phẫu ổn định, không biến chứng cấp tính.",
-                impression: "Theo dõi phục hồi và đánh giá nội tiết.",
-            },
-            {
-                date: "2025-07-05",
-                type: "Khám ban đầu",
-                finding: "Rối loạn thị giác, nghi tổn thương vùng tuyến yên.",
-                impression: "Chỉ định MRI và xét nghiệm nội tiết.",
-            },
-        ],
-    },
-    {
-        id: "BN-1102",
-        name: "Doan Quoc Tuan",
-        age: 63,
-        gender: "Nam",
-        phone: "0971 335 221",
-        doctor: "BS. Nguyen Hai Dang",
-        latestVisit: "2026-04-09",
-        riskLevel: "Cảnh báo cao",
-        diagnosis: "Khối choán chỗ nghi di căn não",
-        visitCount: 2,
-        note: "Cần phối hợp đa chuyên khoa để lên kế hoạch điều trị.",
-        visits: [
-            {
-                date: "2026-04-09",
-                type: "Đánh giá khẩn",
-                finding: "Nhiều tổn thương tăng quang, phù quanh tổn thương rõ.",
-                impression: "Nghi di căn não, cần hội chẩn ung bướu và thần kinh.",
-            },
-            {
-                date: "2026-04-03",
-                type: "Khám ban đầu",
-                finding: "Đau đầu tăng dần, yếu nửa người thoáng qua.",
-                impression: "Ưu tiên chụp MRI và đánh giá nguyên phát ngoài sọ.",
-            },
-        ],
-    },
-];
+const getGenderLabel = (gender) => {
+    if (gender === "male") return "Nam";
+    if (gender === "female") return "Nữ";
+    return gender || "Chưa cập nhật";
+};
 
-const riskStyles = {
-    "Cảnh báo cao": "bg-rose-50 text-rose-700 border-rose-200",
-    "Cần theo dõi sát": "bg-amber-50 text-amber-700 border-amber-200",
-    "Nguy cơ trung bình": "bg-sky-50 text-sky-700 border-sky-200",
-    "Ổn định": "bg-emerald-50 text-emerald-700 border-emerald-200",
+const buildPatientNote = (results) => {
+    if (!results.length) {
+        return "Chưa có dữ liệu kết quả khám được ghi nhận.";
+    }
+
+    const latestResult = results[results.length - 1];
+    return `Đã ghi nhận ${results.length} lần khám. Kết quả gần nhất: ${latestResult.typeName} với diện tích ${latestResult.area}px.`;
+};
+
+const mapPatientsFromApi = (patients, doctorName) => {
+    return (patients || []).map((patient, patientIndex) => {
+        const results = Array.isArray(patient.results) ? patient.results : [];
+        const latestResult = results[results.length - 1] || null;
+
+        return {
+            id: patient.phone || `BN-${patientIndex + 1}`,
+            name: patient.name || `Bệnh nhân ${patientIndex + 1}`,
+            age: patient.age ?? "Chưa cập nhật",
+            gender: getGenderLabel(patient.gender),
+            phone: patient.phone || "Chưa cập nhật",
+            doctor: doctorName || "Bác sĩ phụ trách",
+            diagnosis: latestResult?.typeName || "Chưa có chẩn đoán",
+            visitCount: results.length,
+            note: buildPatientNote(results),
+            visits: results.map((result, resultIndex) => ({
+                id: `${patient.phone || patientIndex}-${resultIndex}`,
+                visitNumber: resultIndex + 1,
+                typeName: result.typeName || "Chưa cập nhật",
+                area: result.area ?? 0,
+            })),
+        };
+    });
 };
 
 export default function Patient() {
     const [searchTerm, setSearchTerm] = useState("");
-    const [selectedDoctor, setSelectedDoctor] = useState("Tất cả");
-    const [selectedPatientId, setSelectedPatientId] = useState(patientRecords[0].id);
+    const [selectedDoctor] = useState("Tất cả");
+    const [selectedPatientId, setSelectedPatientId] = useState("");
+    const [patientRecords, setPatientRecords] = useState([]);
+    const [summary, setSummary] = useState({ patientIsManaging: 0, sumSeeTheDoctor: 0 });
+    const [isLoading, setIsLoading] = useState(false);
+    const accessToken = useSelector((state) => state.user.user.accessToken);
+    const name = useSelector((state) => state.user.user.name);
+    const now = new Date();
+
+    useEffect(() => {
+        const fetchPatientDetail = async () => {
+            if (!accessToken) return;
+
+            try {
+                setIsLoading(true);
+                const response = await apiGetDetail(accessToken);
+                const message = response?.data?.message || {};
+                const mappedPatients = mapPatientsFromApi(message.patients, name);
+
+                setPatientRecords(mappedPatients);
+                setSummary({
+                    patientIsManaging: message.patientIsManaging || mappedPatients.length,
+                    sumSeeTheDoctor: message.sumSeeTheDoctor || 0,
+                });
+                setSelectedPatientId((currentId) => currentId || mappedPatients[0]?.id || "");
+            } catch (error) {
+                setPatientRecords([]);
+                setSummary({ patientIsManaging: 0, sumSeeTheDoctor: 0 });
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        fetchPatientDetail();
+    }, [accessToken, name]);
 
     const doctors = useMemo(() => {
         return ["Tất cả", ...new Set(patientRecords.map((patient) => patient.doctor))];
-    }, []);
+    }, [patientRecords]);
 
     const filteredPatients = useMemo(() => {
         return patientRecords.filter((patient) => {
@@ -171,19 +92,19 @@ export default function Patient() {
                 !keyword ||
                 patient.name.toLowerCase().includes(keyword) ||
                 patient.id.toLowerCase().includes(keyword) ||
-                patient.diagnosis.toLowerCase().includes(keyword);
+                patient.diagnosis.toLowerCase().includes(keyword) ||
+                patient.phone.toLowerCase().includes(keyword);
 
             return matchesDoctor && matchesSearch;
         });
-    }, [searchTerm, selectedDoctor]);
+    }, [patientRecords, searchTerm, selectedDoctor]);
 
     const selectedPatient =
         filteredPatients.find((patient) => patient.id === selectedPatientId) || filteredPatients[0] || null;
 
-    const totalVisits = filteredPatients.reduce((sum, patient) => sum + patient.visitCount, 0);
-    const highRiskPatients = filteredPatients.filter(
-        (patient) => patient.riskLevel === "Cảnh báo cao" || patient.riskLevel === "Cần theo dõi sát"
-    ).length;
+    const totalVisits = searchTerm.trim()
+        ? filteredPatients.reduce((sum, patient) => sum + patient.visitCount, 0)
+        : summary.sumSeeTheDoctor;
 
     return (
         <div className="min-h-screen bg-slate-100 text-slate-900">
@@ -217,18 +138,15 @@ export default function Patient() {
                             <div className="grid gap-4 md:grid-cols-3">
                                 <div className="rounded-[24px] border border-white/10 bg-white/10 p-5 backdrop-blur">
                                     <p className="text-xs uppercase tracking-[0.24em] text-cyan-100/80">Bệnh nhân đang quản lý</p>
-                                    <p className="mt-3 text-4xl font-bold text-white">{filteredPatients.length}</p>
+                                    <p className="mt-3 text-4xl font-bold text-white">
+                                        {searchTerm.trim() ? filteredPatients.length : summary.patientIsManaging}
+                                    </p>
                                     <p className="mt-2 text-sm text-slate-300">Tổng hồ sơ phù hợp với bộ lọc hiện tại.</p>
                                 </div>
                                 <div className="rounded-[24px] border border-white/10 bg-white/10 p-5 backdrop-blur">
                                     <p className="text-xs uppercase tracking-[0.24em] text-cyan-100/80">Tổng lượt thăm khám</p>
                                     <p className="mt-3 text-4xl font-bold text-white">{totalVisits}</p>
                                     <p className="mt-2 text-sm text-slate-300">Bao gồm toàn bộ các lần khám đã ghi nhận.</p>
-                                </div>
-                                <div className="rounded-[24px] border border-white/10 bg-white/10 p-5 backdrop-blur">
-                                    <p className="text-xs uppercase tracking-[0.24em] text-cyan-100/80">Cần ưu tiên theo dõi</p>
-                                    <p className="mt-3 text-4xl font-bold text-amber-300">{highRiskPatients}</p>
-                                    <p className="mt-2 text-sm text-slate-300">Nhóm bệnh nhân có mức cảnh báo cao hơn.</p>
                                 </div>
                             </div>
                         </div>
@@ -239,25 +157,17 @@ export default function Patient() {
                                 <div className="mt-4 space-y-4">
                                     <div className="rounded-2xl bg-white/10 p-4">
                                         <p className="text-xs uppercase tracking-[0.24em] text-slate-300">Bác sĩ phụ trách</p>
-                                        <p className="mt-2 text-2xl font-semibold text-white">{selectedDoctor}</p>
+                                        <p className="mt-2 text-2xl font-semibold text-white">{name}</p>
                                     </div>
 
                                     <div className="grid gap-3 sm:grid-cols-2">
                                         <div className="rounded-2xl bg-white/5 p-4">
-                                            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Bệnh nhân ưu tiên</p>
-                                            <p className="mt-2 text-base font-semibold text-white">
-                                                {filteredPatients.find(
-                                                    (patient) =>
-                                                        patient.riskLevel === "Cảnh báo cao" ||
-                                                        patient.riskLevel === "Cần theo dõi sát"
-                                                )?.name || "Chưa có trường hợp ưu tiên"}
-                                            </p>
+                                            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Cập nhật gần nhất</p>
+                                            <p className="mt-2 text-base font-semibold text-white">{now.toLocaleDateString("vi-VN")}</p>
                                         </div>
                                         <div className="rounded-2xl bg-white/5 p-4">
-                                            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Cập nhật gần nhất</p>
-                                            <p className="mt-2 text-base font-semibold text-white">
-                                                {selectedPatient?.latestVisit || "--"}
-                                            </p>
+                                            <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Số bác sĩ lọc</p>
+                                            <p className="mt-2 text-base font-semibold text-white">{doctors.length - 1 || 1}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -286,7 +196,7 @@ export default function Patient() {
                                 <p className="text-sm font-medium uppercase tracking-[0.2em] text-cyan-700">Patient List</p>
                                 <h2 className="mt-2 text-2xl font-bold text-slate-900">Danh sách bệnh nhân</h2>
                                 <p className="mt-1 text-sm text-slate-500">
-                                    Lọc theo bác sĩ và tìm nhanh theo mã bệnh nhân, tên hoặc nhận định.
+                                    Lọc theo bác sĩ và tìm nhanh theo số điện thoại, tên hoặc loại khối u.
                                 </p>
                             </div>
 
@@ -295,21 +205,9 @@ export default function Patient() {
                                     type="text"
                                     value={searchTerm}
                                     onChange={(event) => setSearchTerm(event.target.value)}
-                                    placeholder="Tìm theo tên bệnh nhân, mã hồ sơ hoặc chẩn đoán..."
+                                    placeholder="Tìm theo số điện thoại bệnh nhân"
                                     className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:bg-white"
                                 />
-
-                                <select
-                                    value={selectedDoctor}
-                                    onChange={(event) => setSelectedDoctor(event.target.value)}
-                                    className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 outline-none transition focus:border-cyan-400 focus:bg-white"
-                                >
-                                    {doctors.map((doctor) => (
-                                        <option key={doctor} value={doctor}>
-                                            {doctor}
-                                        </option>
-                                    ))}
-                                </select>
                             </div>
                         </div>
 
@@ -318,18 +216,15 @@ export default function Patient() {
                                 <p className="text-sm text-slate-500">Bệnh nhân đang hiển thị</p>
                                 <p className="mt-2 text-2xl font-bold text-slate-900">{filteredPatients.length}</p>
                             </div>
-                            <div className="rounded-2xl bg-slate-50 p-4">
-                                <p className="text-sm text-slate-500">Tổng số lần khám</p>
-                                <p className="mt-2 text-2xl font-bold text-slate-900">{totalVisits}</p>
-                            </div>
-                            <div className="rounded-2xl bg-slate-50 p-4">
-                                <p className="text-sm text-slate-500">Bệnh nhân nguy cơ cao</p>
-                                <p className="mt-2 text-2xl font-bold text-rose-600">{highRiskPatients}</p>
-                            </div>
                         </div>
 
                         <div className="space-y-4">
-                            {filteredPatients.length > 0 ? (
+                            {isLoading ? (
+                                <div className="rounded-[24px] border border-dashed border-slate-300 bg-slate-50 px-6 py-12 text-center">
+                                    <p className="text-lg font-semibold text-slate-800">Đang tải dữ liệu bệnh nhân</p>
+                                    <p className="mt-2 text-sm text-slate-500">Hệ thống đang đồng bộ hồ sơ từ cơ sở dữ liệu.</p>
+                                </div>
+                            ) : filteredPatients.length > 0 ? (
                                 filteredPatients.map((patient) => {
                                     const isActive = selectedPatient?.id === patient.id;
 
@@ -345,22 +240,11 @@ export default function Patient() {
                                         >
                                             <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                                                 <div className="space-y-3">
-                                                    <div className="flex flex-wrap items-center gap-3">
-                                                        <h3 className="text-xl font-semibold text-slate-900">{patient.name}</h3>
-                                                        <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
-                                                            {patient.id}
-                                                        </span>
-                                                        <span
-                                                            className={`rounded-full border px-3 py-1 text-xs font-semibold ${riskStyles[patient.riskLevel]
-                                                                }`}
-                                                        >
-                                                            {patient.riskLevel}
-                                                        </span>
-                                                    </div>
+                                                    <h3 className="text-lg font-semibold text-slate-900">{patient.name}</h3>
                                                     <p className="text-sm text-slate-500">
                                                         {patient.gender}, {patient.age} tuổi • Bác sĩ phụ trách: {patient.doctor}
                                                     </p>
-                                                    <p className="text-sm leading-6 text-slate-700">{patient.diagnosis}</p>
+                                                    <p className="text-sm text-slate-600">Loại khối u gần nhất: {patient.diagnosis}</p>
                                                 </div>
 
                                                 <div className="grid gap-3 sm:grid-cols-3 lg:min-w-[290px]">
@@ -368,10 +252,7 @@ export default function Patient() {
                                                         <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Lần khám</p>
                                                         <p className="mt-2 text-lg font-bold text-slate-900">{patient.visitCount}</p>
                                                     </div>
-                                                    <div className="rounded-2xl bg-slate-50 p-3">
-                                                        <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Gần nhất</p>
-                                                        <p className="mt-2 text-sm font-semibold text-slate-900">{patient.latestVisit}</p>
-                                                    </div>
+
                                                     <div className="rounded-2xl bg-slate-50 p-3">
                                                         <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Liên hệ</p>
                                                         <p className="mt-2 text-sm font-semibold text-slate-900">{patient.phone}</p>
@@ -407,14 +288,8 @@ export default function Patient() {
                                     <div className="flex flex-wrap items-start justify-between gap-4">
                                         <div>
                                             <p className="text-sm text-slate-300">Nhận định hiện tại</p>
-                                            <h3 className="mt-2 text-xl font-semibold">{selectedPatient.diagnosis}</h3>
+                                            <h3 className="mt-2 text-xl font-semibold">Nghi ngờ mắc khối u: {selectedPatient.diagnosis}</h3>
                                         </div>
-                                        <span
-                                            className={`rounded-full border px-3 py-1 text-xs font-semibold ${riskStyles[selectedPatient.riskLevel] || "bg-white/10 text-white border-white/20"
-                                                }`}
-                                        >
-                                            {selectedPatient.riskLevel}
-                                        </span>
                                     </div>
 
                                     <div className="mt-5 grid gap-3 sm:grid-cols-2">
@@ -428,21 +303,21 @@ export default function Patient() {
                                         </div>
                                     </div>
 
-                                    <div className="mt-4 rounded-2xl bg-white/5 p-4">
+                                    {/* <div className="mt-4 rounded-2xl bg-white/5 p-4">
                                         <p className="text-sm text-slate-300">Ghi chú hồ sơ</p>
                                         <p className="mt-2 text-sm leading-6 text-slate-100">{selectedPatient.note}</p>
-                                    </div>
+                                    </div> */}
                                 </div>
 
                                 <div className="grid gap-3 sm:grid-cols-3">
                                     <div className="rounded-2xl bg-slate-50 p-4">
-                                        <p className="text-sm text-slate-500">Mã bệnh nhân</p>
-                                        <p className="mt-2 font-semibold text-slate-900">{selectedPatient.id}</p>
+                                        <p className="text-sm text-slate-500">Giới tính</p>
+                                        <p className="mt-2 font-semibold text-slate-900">{selectedPatient.gender}</p>
                                     </div>
                                     <div className="rounded-2xl bg-slate-50 p-4">
-                                        <p className="text-sm text-slate-500">Tuổi / giới tính</p>
+                                        <p className="text-sm text-slate-500">Tuổi</p>
                                         <p className="mt-2 font-semibold text-slate-900">
-                                            {selectedPatient.age} / {selectedPatient.gender}
+                                            {selectedPatient.age}
                                         </p>
                                     </div>
                                     <div className="rounded-2xl bg-slate-50 p-4">
@@ -461,35 +336,35 @@ export default function Patient() {
                                             {selectedPatient.visits.length} hồ sơ
                                         </span>
                                     </div>
-
-                                    <div className="mt-5 space-y-4">
-                                        {selectedPatient.visits.map((visit, index) => (
-                                            <div
-                                                key={`${selectedPatient.id}-${visit.date}-${index}`}
-                                                className="rounded-[24px] border border-slate-200 bg-slate-50 p-4"
-                                            >
-                                                <div className="flex flex-col gap-3 border-b border-slate-200 pb-4 sm:flex-row sm:items-center sm:justify-between">
-                                                    <div>
-                                                        <p className="text-lg font-semibold text-slate-900">{visit.type}</p>
-                                                        <p className="mt-1 text-sm text-slate-500">Ngày khám: {visit.date}</p>
-                                                    </div>
-                                                    <div className="rounded-full bg-white px-4 py-2 text-xs font-semibold text-slate-600 shadow-sm">
-                                                        Lần khám {selectedPatient.visits.length - index}
-                                                    </div>
-                                                </div>
-
-                                                <div className="mt-4 space-y-3">
-                                                    <div className="rounded-2xl bg-white p-4">
-                                                        <p className="text-sm text-slate-500">Kết quả ghi nhận</p>
-                                                        <p className="mt-2 text-sm leading-6 text-slate-700">{visit.finding}</p>
-                                                    </div>
-                                                    <div className="rounded-2xl bg-white p-4">
-                                                        <p className="text-sm text-slate-500">Nhận định của bác sĩ</p>
-                                                        <p className="mt-2 text-sm leading-6 text-slate-700">{visit.impression}</p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ))}
+                                    <div className="mt-4 overflow-hidden rounded-[24px] border border-slate-200">
+                                        <div className="overflow-x-auto">
+                                            <table className="min-w-full divide-y divide-slate-200">
+                                                <thead className="bg-slate-50">
+                                                    <tr>
+                                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                                            Số lần khám
+                                                        </th>
+                                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                                            Loại u
+                                                        </th>
+                                                        <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
+                                                            Diện tích
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100 bg-white">
+                                                    {selectedPatient.visits.map((visit, index) => (
+                                                        <tr key={visit.id} className="text-sm text-slate-700">
+                                                            <td className="px-4 py-3 font-semibold text-slate-900">
+                                                                Lần {selectedPatient.visitCount - index}
+                                                            </td>
+                                                            <td className="px-4 py-3">{visit.typeName}</td>
+                                                            <td className="px-4 py-3">{visit.area} px</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

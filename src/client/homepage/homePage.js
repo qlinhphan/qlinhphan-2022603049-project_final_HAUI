@@ -1,10 +1,19 @@
-﻿import React, { useState } from "react";
+﻿import React, { useEffect, useState } from "react";
 import FeatureClient from "./featureClient";
 import IntroClient from "./introClient";
+import { useSelector } from "react-redux";
 
 // import { img } from '../../public/image.png'
 
 export default function HomePage() {
+
+    const accessToken = useSelector((state) => state.user.user.accessToken)
+
+    // useEffect(() => {
+    //     console.log('cecs: ', accessToken)
+    // }, [])
+
+
     const [page, setPage] = useState("home");
     const [tab, setTab] = useState("upload");
     const [preview, setPreview] = useState(null);
@@ -13,6 +22,8 @@ export default function HomePage() {
         const file = e.target.files[0];
         if (file) setPreview(URL.createObjectURL(file));
     };
+
+
 
     return (
         <div className="min-h-screen bg-gray-100 text-gray-800">
